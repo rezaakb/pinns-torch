@@ -1,16 +1,20 @@
 model:
   _target_: pinnstorch.models.PINNModule
   _partial_: true
-  loss_fn: mse
-  automatic_optimization: false
+  loss_fn: sse
+  automatic_optimization: true
   optimizer:
     _target_: torch.optim.Adam
     _partial_: true
     lr: 0.001
     weight_decay: 0.0
-    capturable: true
-model/params/total: 569760
-model/params/trainable: 569760
+    capturable: false
+  runge_kutta: ${runge_kutta}
+  extra_variables:
+    l1: 0.0
+    l2: -6.0
+model/params/total: 7752
+model/params/trainable: 7752
 model/params/non_trainable: 0
 data:
   _target_: pinnstorch.data.PINNDataModule
@@ -18,11 +22,10 @@ trainer:
   _target_: lightning.pytorch.trainer.Trainer
   default_root_dir: ${paths.output_dir}
   min_epochs: 1
-  max_epochs: 200
-  accelerator: gpu
-  devices:
-  - 0
-  check_val_every_n_epoch: 1
+  max_epochs: 20000
+  accelerator: cpu
+  devices: 1
+  check_val_every_n_epoch: 1000
   inference_mode: false
   log_every_n_steps: 1
   deterministic: false
@@ -51,7 +54,7 @@ extras:
   ignore_warnings: false
   enforce_tags: true
   print_config: true
-task_name: aneurysm3D
+task_name: kdv
 tags:
 - dev
 ckpt_path: null

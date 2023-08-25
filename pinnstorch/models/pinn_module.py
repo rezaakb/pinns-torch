@@ -85,7 +85,7 @@ class PINNModule(LightningModule):
         self.extra_variables = fix_extra_variables(extra_variables)
         self.output_fn = output_fn
         self.pde_fn = pde_fn
-        self.automatic_optimization = False
+        self.automatic_optimization = automatic_optimization
         self.preds_dict = {}
 
         self.rk = runge_kutta
@@ -232,8 +232,8 @@ class PINNModule(LightningModule):
         :param batch_idx: The index of the current batch.
         :return: A tensor of losses between model predictions and targets.
         """
-
-        if self.automatic_optimization or self.trainer.accelerator == "cpu":
+        
+        if self.automatic_optimization:
             self.static_loss, pred = self.model_step(batch, batch_idx)
 
         else:

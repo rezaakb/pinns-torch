@@ -22,18 +22,19 @@ def read_data_fn(root_path):
     :return: Processed data will be used in Mesh class.
     """
 
-    data = pinnstorch.utils.load_data(root_path, "AC.mat")
-    exact_u = np.real(data["uu"])
+    data = pinnstorch.utils.load_data(root_path, "KdV.mat")
+    exact_u = np.real(data["uu"]).astype("float32")
     return {"u": exact_u}
 
 
 def pde_fn(outputs, x, extra_variables):
     """Define the partial differential equations (PDEs)."""
 
-    u = outputs["u"][:, :-1]
-    u_x = pinnstorch.utils.fwd_gradient(u, x)
-    u_xx = pinnstorch.utils.fwd_gradient(u_x, x)
-    outputs["f"] = 5.0 * u - 5.0 * u**3 + 0.0001 * u_xx
+    U = outputs["u"]
+    U_x = pinnstorch.utils.fwd_gradient(U, x)
+    U_xx = pinnstorch.utils.fwd_gradient(U_x, x)
+    U_xxx = pinnstorch.utils.fwd_gradient(U_xx, x)
+    outputs["f"] = -extra_variables["l1"] * U * U_x - torch.exp(extra_variables["l2"]) * U_xxx
     return outputs
 
 

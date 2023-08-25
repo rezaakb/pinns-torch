@@ -15,7 +15,7 @@ def cfg_train_global() -> DictConfig:
 
     :return: A DictConfig object containing a default Hydra configuration for training.
     """
-    with initialize(version_base="1.3", config_path="../examples/ac/configs"):
+    with initialize(version_base="1.3", config_path="../examples/kdv/configs"):
         cfg = compose(config_name="config.yaml", return_hydra_config=True, overrides=[])
 
         # set defaults for all tests
@@ -42,7 +42,7 @@ def cfg_eval_global() -> DictConfig:
 
     :return: A DictConfig containing a default Hydra configuration for evaluation.
     """
-    with initialize(version_base="1.3", config_path="../examples/ac/configs"):
+    with initialize(version_base="1.3", config_path="../examples/kdv/configs"):
         cfg = compose(config_name="config.yaml", return_hydra_config=True, overrides=[])
 
         # set defaults for all tests
