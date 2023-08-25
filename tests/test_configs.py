@@ -1,6 +1,3 @@
-import hydra
-from hydra.core.hydra_config import HydraConfig
-from omegaconf import DictConfig
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -39,6 +36,7 @@ def pde_fn(outputs, x, extra_variables):
     outputs["f"] = 5.0 * u - 5.0 * u**3 + 0.0001 * u_xx
     return outputs
 
+
 def test_train_config(cfg_train: DictConfig) -> None:
     """Tests the training configuration provided by the `cfg_train` pytest fixture.
 
@@ -51,11 +49,9 @@ def test_train_config(cfg_train: DictConfig) -> None:
     assert cfg_train.trainer
 
     HydraConfig().set_config(cfg_train)
-    
-    net = hydra.utils.instantiate(cfg_train.net)(lb=[0.0, 0.0], ub=[1.0, 1.0])
-    hydra.utils.instantiate(cfg_train.model)(
-        net=net, pde_fn=pde_fn, output_fn=output_fn
-    )
+
+    net: torch.nn.Module = hydra.utils.instantiate(cfg_train.net)(lb=[0.0, 0.0], ub=[1.0, 1.0])
+    hydra.utils.instantiate(cfg_train.model)(net=net, pde_fn=pde_fn, output_fn=None)
     hydra.utils.instantiate(cfg_train.trainer)
 
 
@@ -71,8 +67,6 @@ def test_eval_config(cfg_eval: DictConfig) -> None:
 
     HydraConfig().set_config(cfg_eval)
 
-    net = hydra.utils.instantiate(cfg_train.net)(lb=[0.0, 0.0], ub=[1.0, 1.0])
-    hydra.utils.instantiate(cfg_train.model)(
-        net=net, pde_fn=pde_fn, output_fn=output_fn
-    )
+    net: torch.nn.Module = hydra.utils.instantiate(cfg_eval.net)(lb=[0.0, 0.0], ub=[1.0, 1.0])
+    hydra.utils.instantiate(cfg_eval.model)(net=net, pde_fn=pde_fn, output_fn=None)
     hydra.utils.instantiate(cfg_eval.trainer)
