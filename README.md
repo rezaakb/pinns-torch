@@ -1,8 +1,9 @@
-______________________________________________________________________
 
 <div align="center">
 
 <img src="http://drive.google.com/uc?export=view&id=1JO83M12_y2F8h7QYZZSK5NXkRSdWnSqy" width="400">
+</br>
+</br>
 
 <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white"></a>
 <a href="https://pytorchlightning.ai/"><img alt="Lightning" src="https://img.shields.io/badge/-Lightning-792ee5?logo=pytorchlightning&logoColor=white"></a>
@@ -11,9 +12,17 @@ ______________________________________________________________________
 
 </div>
 
+
 ## Description
 
-This package is
+Our package introduces Physics-Informed Neural Networks (PINNs) implemented using PyTorch. The standout feature is the incorporation of CUDAGraphs for compiling models, resulting in significant performance gains of 3x to 10x compared to traditional PyTorch implementations.
+
+<div align="center">
+<img src="http://drive.google.com/uc?export=view&id=1qbDpnSZiDRm5CQKjAUkNsfYcDqLEShQA" width="500">
+</br>
+<em>Comparing elapsed time for a single epoch in solving Navier-Stokes, Allen-Cahn, and Burgers partial differential equations using naive models and models compiled with CUDAGraphs. </em>
+</div>
+
 
 ## Installation
 
@@ -46,13 +55,13 @@ pip install -r requirements.txt```
 
 ## Quick start
 
-There are several implemented examples on examples folder. For example, you can run the code corresponding to navier stokes pde: 
+There are several implemented examples on [examples](examples) folder. For example, you can run the code corresponding to navier stokes pde: 
 
 ```bash
 python examples/navier_stokes/train.py
 ```
 
-Train model with chosen experiment configuration from [examples/navier_stokes/configs/config.yaml](cexamples/navier_stokes/configs/config.yaml). You can override any parameter from command line like this
+Train model with chosen experiment configuration; for example, from [examples/navier_stokes/configs/config.yaml](examples/navier_stokes/configs/config.yaml). You can override any parameter from command line like this
 
 ```bash
 python examples/navier_stokes/train.py trainer.max_epochs=20 n_train=3000
