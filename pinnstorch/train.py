@@ -12,7 +12,7 @@ from omegaconf import DictConfig, OmegaConf
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
 from pinnstorch import utils
-from pinnstorch.data import PointCloud, Mesh, TimeDomain, SpatialDomain
+from .data import PointCloud, Mesh, TimeDomain, SpatialDomain
 
 log = utils.get_pylogger(__name__)
 
