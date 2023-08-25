@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple, Callable
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 
 import hydra
 import lightning as L
@@ -12,7 +12,7 @@ from omegaconf import DictConfig, OmegaConf
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
 from pinnstorch import utils
-from .data import PointCloud, Mesh, TimeDomain, SpatialDomain
+from pinnstorch.data import PointCloud, Mesh, TimeDomain, Interval, Rectangle, RectangularPrism
 
 log = utils.get_pylogger(__name__)
 
@@ -61,7 +61,7 @@ def train(
 
     if cfg.get("spatial_domain"):
         log.info(f"Instantiating spatial domain <{cfg.spatial_domain._target_}>")
-        sd: SpatialDomain = hydra.utils.instantiate(cfg.spatial_domain)
+        sd: Union[Interval, Rectangle, RectangularPrism] = hydra.utils.instantiate(cfg.spatial_domain)
 
     log.info(f"Instantiating mesh <{cfg.mesh._target_}>")
     if cfg.mesh._target_ == "pinnstorch.data.Mesh":
