@@ -10,8 +10,21 @@ Welcome to pinns-torch's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-    modules
 
+PINNs-Torch models
+=====================
+.. automodule:: pinnstorch.models
+   :members:
+
+PINNs-Torch data
+=================
+.. automodule:: pinnstorch.data
+   :members:
+
+PINNs-Torch utils
+===================
+.. automodule:: pinnstorch.utils
+   :members:
 
 
 Indices and tables

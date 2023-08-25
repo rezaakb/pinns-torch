@@ -1,21 +1,27 @@
-pinnstorch.models.net package
-=============================
+Neural Nets
+===========
 
-Submodules
-----------
-
-pinnstorch.models.net.neural\_net module
-----------------------------------------
+We have two different neural nets. `FCN` and `NetHFM`.
 
 .. automodule:: pinnstorch.models.net.neural_net
    :members:
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+Usage Example
+-------------
 
-.. automodule:: pinnstorch.models.net
-   :members:
-   :undoc-members:
-   :show-inheritance:
+Here's how to use the class provided by this module:
+
+.. code-block:: python
+
+   from pinnstorch.models.net.neural_net import FCN
+
+   net = FCN(
+    layers = [2, 50, 50, 2],
+    lb = mesh.lb,
+    ub = mesh.ub,
+    output_names = ['u', 'v'],
+    discrete = False
+   )
+

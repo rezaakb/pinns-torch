@@ -8,11 +8,11 @@ from lightning import Callback, LightningDataModule, LightningModule, Trainer
 from lightning.pytorch.loggers import Logger
 from omegaconf import DictConfig, OmegaConf
 
-import pinnstorch
 
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
 from pinnstorch import utils
+from pinnstorch.data import PointCloud, Mesh, TimeDomain, SpatialDomain
 
 log = utils.get_pylogger(__name__)
 
@@ -57,19 +57,19 @@ def train(
 
     if cfg.get("time_domain"):
         log.info(f"Instantiating time domain <{cfg.time_domain._target_}>")
-        td: pinnstorch.data.TimeDomain = hydra.utils.instantiate(cfg.time_domain)
+        td: TimeDomain = hydra.utils.instantiate(cfg.time_domain)
 
     if cfg.get("spatial_domain"):
         log.info(f"Instantiating spatial domain <{cfg.spatial_domain._target_}>")
-        sd: pinnstorch.data.SpatialDomain = hydra.utils.instantiate(cfg.spatial_domain)
+        sd: SpatialDomain = hydra.utils.instantiate(cfg.spatial_domain)
 
     log.info(f"Instantiating mesh <{cfg.mesh._target_}>")
     if cfg.mesh._target_ == "pinnstorch.data.Mesh":
-        mesh: pinnstorch.data.Mesh = hydra.utils.instantiate(
+        mesh: Mesh = hydra.utils.instantiate(
             cfg.mesh, time_domain=td, spatial_domain=sd, read_data_fn=read_data_fn
         )
     elif cfg.mesh._target_ == "pinnstorch.data.PointCloud":
-        mesh: pinnstorch.data.PointCloud = hydra.utils.instantiate(
+        mesh: PointCloud = hydra.utils.instantiate(
             cfg.mesh, read_data_fn=read_data_fn
         )
     else:
