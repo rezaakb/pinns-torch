@@ -13,7 +13,6 @@ class SamplerBase(Dataset):
     def concatenate_solutions(self, flatten_mesh):
         """Concatenate dictionary of sampled solution data.
 
-        
         :param flatten_mesh: Flattened mesh data.
         :return: Flattened mesh data with concatenated solutions.
         """
@@ -24,7 +23,7 @@ class SamplerBase(Dataset):
         flatten_mesh[2] = np.concatenate(concatenated_solutions, axis=-1)
 
         return flatten_mesh
-    
+
     def sample_mesh(self, num_sample, flatten_mesh):
         """Sample the mesh data for training.
 
@@ -110,9 +109,9 @@ class SamplerBase(Dataset):
         return len(self.spatial_domain_sampled[0])
 
     def __getitem__(self, idx):
-        """Get a specific sampled data point using indexing.
-        In some cases, we may not have `time_domain` and `solution_domain`. 
-        For example, in periodic boundary condition, there is not `solution_domain`.
+        """Get a specific sampled data point using indexing. In some cases, we may not have
+        `time_domain` and `solution_domain`. For example, in periodic boundary condition, there is
+        not `solution_domain`.
 
         :param idx: Index of the desired data point.
         :return: Tuple containing spatial, time, and solution data for the indexed point.

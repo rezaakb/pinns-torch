@@ -2,9 +2,10 @@ from typing import Callable, List, Union
 
 import numpy as np
 import torch
-
 from pyDOE import lhs
+
 from pinnstorch.data import Interval, Rectangle, RectangularPrism, TimeDomain
+
 
 class MeshBase:
     def __init__():
@@ -106,19 +107,23 @@ class MeshBase:
         solution_domain = {}
         if solution_names is not None:
             for solution_name in solution_names:
-                solution_domain[solution_name] = self.solution[solution_name][:, :].flatten()[:, None]
+                solution_domain[solution_name] = self.solution[solution_name][:, :].flatten()[
+                    :, None
+                ]
 
         return spatial_domain, time_domain, solution_domain
 
 
 class Mesh(MeshBase):
-    def __init__(self,
-                 spatial_domain: Union[Interval, Rectangle, RectangularPrism],
-                 time_domain: TimeDomain,
-                 root_dir: str,
-                 read_data_fn: Callable,
-                 ub: List = None,
-                 lb: List = None):
+    def __init__(
+        self,
+        spatial_domain: Union[Interval, Rectangle, RectangularPrism],
+        time_domain: TimeDomain,
+        root_dir: str,
+        read_data_fn: Callable,
+        ub: List = None,
+        lb: List = None,
+    ):
         """Generate a mesh based on spatial and time domains, and load solution data.
 
         :param spatial_domain: Instance of a SpatialDomain class.
@@ -147,11 +152,7 @@ class Mesh(MeshBase):
 
 
 class PointCloud(MeshBase):
-    def __init__(self,
-                 root_dir: str,
-                 read_data_fn: Callable,
-                 ub: List = None,
-                 lb: List = None):
+    def __init__(self, root_dir: str, read_data_fn: Callable, ub: List = None, lb: List = None):
         """Generate a point cloud mesh and load data from files.
 
         :param root_dir: Root directory for data.

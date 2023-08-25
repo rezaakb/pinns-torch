@@ -61,7 +61,6 @@ class MeshSampler(SamplerBase):
 
         self.spatial_domain_sampled = list(torch.split(self.spatial_domain_sampled, (1), dim=1))
 
-    
     def loss_fn(self, inputs, loss, **functions):
         """Compute the loss function based on inputs and functions.
 
@@ -131,10 +130,10 @@ class DiscreteMeshSampler(SamplerBase):
         self._mode = value
 
     def loss_fn(self, inputs, loss, **functions):
-        """Compute the loss function based on inputs and functions.
-        _mode is assigned in PINNDataModule class
-        It can be `inverse_discrete_1`, `inverse_discrete_2`, or `forward_discrete`
-        
+        """Compute the loss function based on inputs and functions. _mode is assigned in
+        PINNDataModule class It can be `inverse_discrete_1`, `inverse_discrete_2`, or
+        `forward_discrete`
+
         :param inputs: Input data for computing the loss.
         :param loss: Loss variable.
         :param functions: Additional functions required for loss computation.

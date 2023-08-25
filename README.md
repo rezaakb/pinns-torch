@@ -2,7 +2,7 @@ ______________________________________________________________________
 
 <div align="center">
 
-![PINNs-Torch Cover Image](http://drive.google.com/uc?export=view&id=1JO83M12_y2F8h7QYZZSK5NXkRSdWnSqy)
+<img src="http://drive.google.com/uc?export=view&id=1JO83M12_y2F8h7QYZZSK5NXkRSdWnSqy" width="400">
 
 <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white"></a>
 <a href="https://pytorchlightning.ai/"><img alt="Lightning" src="https://img.shields.io/badge/-Lightning-792ee5?logo=pytorchlightning&logoColor=white"></a>
@@ -17,10 +17,22 @@ This package is
 
 ## Installation
 
-#### Pip
+PINNs-Torch requires following dependencies to be installed:
+
+- [PyTorch](https://pytorch.org) >=2.0.0
+- [PyTorch Lightning](https://lightning.ai/) >= 2.0.0
+- [Hydra](https://hydra.cc/docs/intro/) >= 1.3
+
+Then, you can install PINNs-Torch itself via [pip]:
+
 
 ```bash
-# clone project
+pip install pinnstorch
+```
+
+If you intend to introduce new functionalities or make code modifications, we suggest duplicating the repository and setting up a local installation:
+
+```bash
 git clone https://github.com/rezaakb/pinnstorch
 cd pinnstorch
 
@@ -28,47 +40,32 @@ cd pinnstorch
 conda create -n myenv python=3.9
 conda activate myenv
 
-# install pytorch according to instructions
-# https://pytorch.org/get-started/
-
 # install requirements
-pip install -r requirements.txt
+pip install -r requirements.txt```
 ```
 
-#### Conda
+## Quick start
+
+There are several implemented examples on examples folder. For example, you can run the code corresponding to navier stokes pde: 
 
 ```bash
-# clone project
-git clone https://github.com/rezaakb/pinnstorch
-cd pinnstorch
-
-# create conda environment and install dependencies
-conda env create -f environment.yaml -n myenv
-
-# activate conda environment
-conda activate myenv
+python examples/navier_stokes/train.py
 ```
 
-## How to start
-
-There are several examples on examples folder.
+Train model with chosen experiment configuration from [examples/navier_stokes/configs/config.yaml](cexamples/navier_stokes/configs/config.yaml). You can override any parameter from command line like this
 
 ```bash
-# train on CPU
-python examples/kdv/train.py trainer=cpu
-
-# train on GPU
-python examples/kdv/train.py trainer=gpu
+python examples/navier_stokes/train.py trainer.max_epochs=20 n_train=3000
 ```
 
-Train model with chosen experiment configuration from [configs/experiment/](configs/experiment/)
+## Contributing
 
-```bash
-python src/train.py experiment=experiment_name.yaml
-```
+We greatly value contributions from the community. If you identify any missing features, encounter bugs, or notice unexpected behavior while utilizing this library, we kindly invite you to open an issue or submit a pull request on GitHub. Alternatively, please feel free to reach out to the authors directly. Your input is highly appreciated and will help enhance the quality of our project.
 
-You can override any parameter from command line like this
+## License
 
-```bash
-python src/train.py trainer.max_epochs=20 data.batch_size=64
-```
+Distributed under the terms of the [BSD-3] license, "pinnstorch" is free and open source software.
+
+## Resources
+
+We employed [this template](https://github.com/ashleve/lightning-hydra-template) to develop the package, drawing from its structure and design principles. For a deeper understanding, we recommend visiting their GitHub repository.

@@ -1,6 +1,6 @@
 task_name: ac
 tags:
-- dev
+  - dev
 train: true
 test: false
 compile: true
@@ -24,14 +24,14 @@ net:
   _target_: pinnstorch.models.FCN
   _partial_: true
   layers:
-  - 1
-  - 200
-  - 200
-  - 200
-  - 200
-  - ${eval:'${q} + 1'}
+    - 1
+    - 200
+    - 200
+    - 200
+    - 200
+    - ${eval:'${q} + 1'}
   output_names:
-  - u
+    - u
   discrete: ${discrete}
 callbacks:
   model_checkpoint:
@@ -59,7 +59,7 @@ logger:
     _target_: lightning.pytorch.loggers.csv_logs.CSVLogger
     save_dir: ${paths.output_dir}
     name: csv/
-    prefix: ''
+    prefix: ""
 trainer:
   _target_: lightning.pytorch.trainer.Trainer
   default_root_dir: ${paths.output_dir}
@@ -67,7 +67,7 @@ trainer:
   max_epochs: 1000000
   accelerator: gpu
   devices:
-  - 0
+    - 0
   check_val_every_n_epoch: 1000
   inference_mode: false
   log_every_n_steps: 1
@@ -85,33 +85,33 @@ extras:
   print_config: true
 idx_t0: 20
 idx_t1: 180
-'N': 200
+"N": 200
 q: 100
 discrete: true
 time_domain:
   _target_: pinnstorch.data.TimeDomain
   t_interval:
-  - 0
-  - 1
+    - 0
+    - 1
   t_points: 201
 spatial_domain:
   _target_: pinnstorch.data.Interval
   x_interval:
-  - -1
-  - 0.99609375
+    - -1
+    - 0.99609375
   shape:
-  - 512
-  - 1
+    - 512
+    - 1
 mesh:
   _target_: pinnstorch.data.Mesh
   root_dir: ${paths.data_dir}
   read_data_fn: ???
   ub:
-  - 1.0
-  - 1.0
+    - 1.0
+    - 1.0
   lb:
-  - -1.0
-  - 0.0
+    - -1.0
+    - 0.0
 runge_kutta:
   _target_: pinnstorch.models.RungeKutta
   root_dir: ${paths.rk_dir}
@@ -120,33 +120,33 @@ runge_kutta:
   t2: ${idx_t1}
   time_domain: ${time_domain}
 train_datasets:
-- mesh_sampler:
-    _target_: pinnstorch.data.DiscreteMeshSampler
-    _partial_: true
-    num_sample: ${N}
-    idx_t: ${idx_t0}
-    solution:
-    - u
-    collection_points:
-    - f
-- periodic_boundary_condition:
-    _target_: pinnstorch.data.PeriodicBoundaryCondition
-    _partial_: true
-    idx_t: ${idx_t1}
-    derivative_order: 1
-    solution:
-    - u
-    discrete: ${discrete}
+  - mesh_sampler:
+      _target_: pinnstorch.data.DiscreteMeshSampler
+      _partial_: true
+      num_sample: ${N}
+      idx_t: ${idx_t0}
+      solution:
+        - u
+      collection_points:
+        - f
+  - periodic_boundary_condition:
+      _target_: pinnstorch.data.PeriodicBoundaryCondition
+      _partial_: true
+      idx_t: ${idx_t1}
+      derivative_order: 1
+      solution:
+        - u
+      discrete: ${discrete}
 val_dataset:
-- mesh_sampler:
-    _target_: pinnstorch.data.DiscreteMeshSampler
-    _partial_: true
-    idx_t: ${idx_t1}
-    solution:
-    - u
+  - mesh_sampler:
+      _target_: pinnstorch.data.DiscreteMeshSampler
+      _partial_: true
+      idx_t: ${idx_t1}
+      solution:
+        - u
 optimized_metric:
   error:
-  - u
+    - u
 plotting:
   _target_: pinnstorch.utils.plot_ac
   _partial_: true

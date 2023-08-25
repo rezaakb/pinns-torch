@@ -233,7 +233,7 @@ class PINNModule(LightningModule):
         :return: A tensor of losses between model predictions and targets.
         """
 
-        if self.automatic_optimization or self.trainer.accelerator == 'cpu':
+        if self.automatic_optimization or self.trainer.accelerator == "cpu":
             self.static_loss, pred = self.model_step(batch, batch_idx)
 
         else:
@@ -257,9 +257,9 @@ class PINNModule(LightningModule):
             for key in self.extra_variables:
                 self.log(key, self.extra_variables[key], prog_bar=True)
 
-    def eval_step(self,
-                  batch: Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
-                 ) -> Tuple[torch.Tensor, Dict[str, torch.Tensor], Dict[str, torch.Tensor]]:
+    def eval_step(
+        self, batch: Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
+    ) -> Tuple[torch.Tensor, Dict[str, torch.Tensor], Dict[str, torch.Tensor]]:
         """Perform a single evaluation step on a batch of data.
 
         :param batch: A batch of data containing input tensors and conditions.
@@ -281,7 +281,7 @@ class PINNModule(LightningModule):
                     )
                     for solution_name in solution
                 }
-                
+
             else:
                 error_dict = {
                     solution_name: relative_l2_error(preds[solution_name], u[solution_name])
@@ -311,7 +311,6 @@ class PINNModule(LightningModule):
         for solution_name, error in error_dict.items():
             self.val_error(error)
             self.log(f"val/error_{solution_name}", error, prog_bar=True, sync_dist=False)
-
 
     def on_validation_epoch_end(self) -> None:
         "Lightning hook that is called when a validation epoch ends."

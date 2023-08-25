@@ -204,12 +204,11 @@ class PeriodicBoundaryCondition(SamplerBase):
 
         if self.derivative_order > 0:
             for solution_name in self.solution_names:
-                
                 if self.discrete:
                     outputs["tmp"] = utils.fwd_gradient(outputs[solution_name], x)
                 else:
                     outputs["tmp"] = utils.gradient(outputs[solution_name], x)
-                
+
                 loss = functions["loss_fn"](loss, outputs, keys=["tmp"], mid=self.mid)
 
         loss = functions["loss_fn"](loss, outputs, keys=self.solution_names, mid=self.mid)

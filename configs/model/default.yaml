@@ -8,8 +8,6 @@ optimizer:
   lr: 0.001
   weight_decay: 0.0
   capturable: true
-
-
 #scheduler:
 #  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
 #  _partial_: true

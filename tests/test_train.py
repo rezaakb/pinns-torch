@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig, open_dict
-from src.train import train
+from pinnstorch.train import train
 
 from tests.helpers.run_if import RunIf
 
