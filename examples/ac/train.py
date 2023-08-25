@@ -15,21 +15,21 @@ def read_data_fn(root_path):
     :param root_path: The root directory containing the data.
     :return: Processed data will be used in Mesh class.
     """
-    
+
     data = pinnstorch.utils.load_data(root_path, "AC.mat")
     exact_u = np.real(data["uu"])
     return {"u": exact_u}
-    
+
 
 def pde_fn(outputs, x, extra_variables):
     """Define the partial differential equations (PDEs)."""
-    
+
     u = outputs["u"][:, :-1]
     u_x = pinnstorch.utils.fwd_gradient(u, x)
     u_xx = pinnstorch.utils.fwd_gradient(u_x, x)
     outputs["f"] = 5.0 * u - 5.0 * u**3 + 0.0001 * u_xx
     return outputs
-    
+
 
 @hydra.main(version_base="1.3", config_path="configs", config_name="config.yaml")
 def main(cfg: DictConfig) -> Optional[float]:
@@ -55,7 +55,7 @@ def main(cfg: DictConfig) -> Optional[float]:
 
     # return optimized metric
     return metric_value
-    
+
 
 if __name__ == "__main__":
     main()

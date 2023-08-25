@@ -6,33 +6,33 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "pinns-torch"
-copyright = "2023, Reza Akbarian Bafghi"
-author = "Reza Akbarian Bafghi"
-release = "0.0.1"
+project = 'pinns-torch'
+copyright = '2023, Reza Akbarian Bafghi'
+author = 'Reza Akbarian Bafghi'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = []
 
-templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+templates_path = ['_templates']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+
+autodoc_mock_imports = ["hydra"]
 
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "sphinx_rtd_theme"
-html_static_path = ["_static"]
+html_theme = 'sphinx_rtd_theme'
+html_static_path = ['_static']
 
-import os
-import sys
+import os, sys
 
-sys.path.append(os.path.abspath(".."))
+sys.path.insert(0, os.path.abspath('..'))
 
 extensions = [
-    "sphinx.ext.duration",
-    "sphinx.ext.doctest",
-    "sphinx.ext.autodoc",
+    'sphinx.ext.autodoc',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.napoleon'
 ]

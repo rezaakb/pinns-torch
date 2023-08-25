@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Callable
 
 import hydra
 import lightning as L
@@ -21,7 +21,10 @@ OmegaConf.register_new_resolver("eval", eval)
 
 @utils.task_wrapper
 def train(
-    cfg: DictConfig, read_data_fn, pde_fn, output_fn
+    cfg: DictConfig,
+    read_data_fn: Callable,
+    pde_fn: Callable,
+    output_fn: Callable = None
 ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     """Trains the model. Can additionally evaluate on a testset, using best weights obtained during
     training.

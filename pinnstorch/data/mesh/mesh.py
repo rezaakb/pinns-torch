@@ -118,6 +118,7 @@ class MeshBase:
 
 class Mesh(MeshBase):
     """For using this class you should define a SpatialDomain and TimeDomain classes.
+
     If dimensions of mesh is not determined, it is better to use PointCloud.
     """
 

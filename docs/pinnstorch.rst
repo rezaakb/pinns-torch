@@ -14,14 +14,6 @@ Subpackages
 Submodules
 ----------
 
-pinnstorch.eval module
-----------------------
-
-.. automodule:: pinnstorch.eval
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 pinnstorch.train module
 -----------------------
 
