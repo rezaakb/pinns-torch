@@ -13,13 +13,12 @@ from omegaconf import DictConfig
 
 
 def read_data_fn(root_path):
-    """
-    Read and preprocess data from the specified root path.
-    
+    """Read and preprocess data from the specified root path.
+
     :param root_path: The root directory containing the data.
     :return: Processed data in the form of a PointCloudData object.
     """
-    
+
     data = pinnstorch.utils.load_data(root_path, "Aneurysm3D.mat")
 
     t_star = data["t_star"]  # T x 1
@@ -41,9 +40,8 @@ def read_data_fn(root_path):
 
 
 def pde_fn(outputs, x, y, z, t, extra_variables=None):
-    """
-    Define the partial differential equations (PDEs).
-    
+    """Define the partial differential equations (PDEs).
+
     :param outputs: Dictionary containing the network outputs for different variables.
     :param x: Spatial coordinate x.
     :param y: Spatial coordinate y.
@@ -52,7 +50,7 @@ def pde_fn(outputs, x, y, z, t, extra_variables=None):
     :param extra_variables: Additional variables if needed (optional).
     :return: Dictionary of computed PDE terms for each variable.
     """
-    
+
     Pec = 1.0 / 0.0101822
     Rey = 1.0 / 0.0101822
 

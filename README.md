@@ -1,4 +1,3 @@
-
 <div align="center">
 
 <img src="http://drive.google.com/uc?export=view&id=1JO83M12_y2F8h7QYZZSK5NXkRSdWnSqy" width="400">
@@ -12,7 +11,6 @@
 
 </div>
 
-
 ## Description
 
 Our package introduces Physics-Informed Neural Networks (PINNs) implemented using PyTorch. The standout feature is the incorporation of CUDAGraphs for compiling models, resulting in significant performance gains of 3x to 10x compared to traditional PyTorch implementations.
@@ -23,7 +21,6 @@ Our package introduces Physics-Informed Neural Networks (PINNs) implemented usin
 <em>Comparing elapsed time for a single epoch in solving Navier-Stokes, Allen-Cahn, and Burgers partial differential equations using naive models and models compiled with CUDAGraphs. </em>
 </div>
 
-
 ## Installation
 
 PINNs-Torch requires following dependencies to be installed:
@@ -32,8 +29,7 @@ PINNs-Torch requires following dependencies to be installed:
 - [PyTorch Lightning](https://lightning.ai/) >= 2.0.0
 - [Hydra](https://hydra.cc/docs/intro/) >= 1.3
 
-Then, you can install PINNs-Torch itself via [pip]:
-
+Then, you can install PINNs-Torch itself via \[pip\]:
 
 ```bash
 pip install pinnstorch
@@ -41,7 +37,7 @@ pip install pinnstorch
 
 If you intend to introduce new functionalities or make code modifications, we suggest duplicating the repository and setting up a local installation:
 
-```bash
+````bash
 git clone https://github.com/rezaakb/pinnstorch
 cd pinnstorch
 
@@ -51,11 +47,11 @@ conda activate myenv
 
 # install requirements
 pip install -r requirements.txt```
-```
+````
 
 ## Quick start
 
-There are several implemented examples on [examples](examples) folder. For example, you can run the code corresponding to navier stokes pde: 
+There are several implemented examples on [examples](examples) folder. For example, you can run the code corresponding to navier stokes pde:
 
 ```bash
 python examples/navier_stokes/train.py
@@ -77,7 +73,7 @@ We greatly value contributions from the community. If you identify any missing f
 
 ## License
 
-Distributed under the terms of the [BSD-3] license, "pinnstorch" is free and open source software.
+Distributed under the terms of the \[BSD-3\] license, "pinnstorch" is free and open source software.
 
 ## Resources
 

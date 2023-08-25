@@ -109,11 +109,11 @@ class PINNDataModule(LightningDataModule):
             for train_dataset in self.train_datasets:
                 name = type(train_dataset).__name__
 
-                ## Add order of gradient to Periodic Boundary Condition
+                # Add order of gradient to Periodic Boundary Condition
                 if name == "PeriodicBoundaryCondition":
                     name = f"{name}_{train_dataset.derivative_order}"
 
-                ## Add branch name to mesh sampler.
+                # Add branch name to mesh sampler.
                 if name == "MeshSampler":
                     if train_dataset.use_data and train_dataset.idx_t is None:
                         name = f"{name}_{'use_data'}"

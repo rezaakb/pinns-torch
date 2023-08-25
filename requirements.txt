@@ -25,3 +25,4 @@ pytest          # tests
 
 pyDOE
 scipy
+matplotlib

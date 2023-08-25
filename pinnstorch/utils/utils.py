@@ -137,6 +137,14 @@ def get_metric_value(metric_dict: Dict[str, Any], metric_names: list) -> float:
 
 
 def download_file(path, folder_name, filename):
+    """
+    Download a file from a given URL and save it to the specified path.
+    
+    :param path: Path where the file should be saved.
+    :param folder_name: Name of the folder containing the file on the server.
+    :param filename: Name of the file to be downloaded.
+    """
+    
     url = f"https://storage.googleapis.com/pinns/{folder_name}/{filename}"
     response = requests.get(url)
     if response.status_code == 200:
@@ -149,6 +157,13 @@ def download_file(path, folder_name, filename):
 
 
 def load_data_txt(root_path, file_name):
+    """
+    Load text data from a file, downloading it if not already present.
+    
+    :param root_path: The root directory where the data file should be located.
+    :param file_name: Name of the data file.
+    :return: Loaded data as a numpy array.
+    """
     path = os.path.join(root_path, file_name)
     if os.path.exists(path):
         log.info("Weights are available.")
@@ -159,6 +174,14 @@ def load_data_txt(root_path, file_name):
 
 
 def load_data(root_path, file_name):
+    """
+    Load data from a MATLAB .mat file, downloading it if not already present.
+    
+    :param root_path: The root directory where the data file should be located.
+    :param file_name: Name of the data file.
+    :return: Loaded data using scipy.io.loadmat function.
+    """
+    
     path = os.path.join(root_path, file_name)
     if os.path.exists(path):
         log.info("Data is available.")

@@ -13,6 +13,14 @@ log = logging.getLogger(__name__)
 
 
 def figsize(scale, nplots=1):
+    """
+    Calculate the figure size based on a given scale and number of plots.
+    
+    :param scale: Scaling factor for the figure size.
+    :param nplots: Number of subplots in the figure (default is 1).
+    :return: Calculated figure size in inches.
+    """
+    
     fig_width_pt = 390.0  # Get this from LaTeX using \the\textwidth
     inches_per_pt = 1.0 / 72.27  # Convert pt to inch
     golden_mean = (np.sqrt(5.0) - 1.0) / 2.0  # Aesthetic ratio (you could change this)
@@ -28,12 +36,27 @@ import matplotlib.pyplot as plt
 
 
 def newfig(width, nplots=1):
+    """
+    Create a new figure with a specified width and number of subplots.
+    
+    :param width: Width of the figure.
+    :param nplots: Number of subplots in the figure (default is 1).
+    :return: Created figure and subplot axis.
+    """
+    
     fig = plt.figure(figsize=figsize(width, nplots))
     ax = fig.add_subplot(111)
     return fig, ax
 
 
 def savefig(filename, crop=True):
+    """
+    Save a figure to the specified filename with optional cropping.
+    
+    :param filename: Name of the output file (without extension).
+    :param crop: Whether to apply tight cropping to the saved image (default is True).
+    """
+    
     log.info(f"Image saved at {filename}")
 
     if crop == True:
@@ -45,6 +68,10 @@ def savefig(filename, crop=True):
 
 
 def plot_navier_stokes(mesh, preds, train_datasets, val_dataset, file_name):
+    """
+    Plot Navier-Stokes continuous inverse PDE
+    """
+    
     x, t, u = train_datasets[0][:]
     p_star = mesh.solution["p"][:, 100]
     p_pred = preds["p"].reshape(p_star.shape)
@@ -83,7 +110,7 @@ def plot_navier_stokes(mesh, preds, train_datasets, val_dataset, file_name):
     ax.set_aspect("equal", "box")
     ax.set_title("Predicted pressure", fontsize=10)
 
-    ########     Exact p(t,x,y)     ###########
+    # Exact p(t,x,y)
     ax = plt.subplot(gs2[:, 1])
     h = ax.imshow(
         P_exact,
@@ -105,6 +132,10 @@ def plot_navier_stokes(mesh, preds, train_datasets, val_dataset, file_name):
 
 
 def plot_kdv(mesh, preds, train_datasets, val_dataset, file_name):
+    """
+    Plot KdV discrete inverse PDE
+    """
+    
     fig, ax = newfig(1.0, 1.2)
     ax.axis("off")
 
@@ -116,7 +147,7 @@ def plot_kdv(mesh, preds, train_datasets, val_dataset, file_name):
     idx_t1 = train_datasets[1].idx_t
     exact_u = mesh.solution["u"]
 
-    ####### Row 0: h(t,x) ##################
+    # Row 0: h(t,x)
     gs0 = gridspec.GridSpec(1, 2)
     gs0.update(top=1 - 0.06, bottom=1 - 1 / 2 + 0.1, left=0.15, right=0.85, wspace=0)
     ax = plt.subplot(gs0[:, :])
@@ -147,7 +178,7 @@ def plot_kdv(mesh, preds, train_datasets, val_dataset, file_name):
     leg = ax.legend(frameon=False, loc="best")
     ax.set_title("$u(t,x)$", fontsize=10)
 
-    ####### Row 1: h(t,x) slices ##################
+    # Row 1: h(t,x) slices
     gs1 = gridspec.GridSpec(1, 2)
     gs1.update(top=1 - 1 / 2 - 0.05, bottom=0.15, left=0.15, right=0.85, wspace=0.5)
 
@@ -172,6 +203,10 @@ def plot_kdv(mesh, preds, train_datasets, val_dataset, file_name):
 
 
 def plot_ac(mesh, preds, train_datasets, val_dataset, file_name):
+    """
+    Plot Allen-Cahn discrete forward PDE
+    """
+    
     fig, ax = newfig(1.0, 1.2)
 
     x0 = train_datasets[0].spatial_domain_sampled[0].detach().numpy()
@@ -183,7 +218,7 @@ def plot_ac(mesh, preds, train_datasets, val_dataset, file_name):
 
     ax.axis("off")
 
-    ####### Row 0: h(t,x) ##################
+    # Row 0: h(t,x)
     gs0 = gridspec.GridSpec(1, 2)
     gs0.update(top=1 - 0.06, bottom=1 - 1 / 2 + 0.1, left=0.15, right=0.85, wspace=0)
     ax = plt.subplot(gs0[:, :])
@@ -214,7 +249,7 @@ def plot_ac(mesh, preds, train_datasets, val_dataset, file_name):
     leg = ax.legend(frameon=False, loc="best")
     ax.set_title("$u(t,x)$", fontsize=10)
 
-    ####### Row 1: h(t,x) slices ##################
+    # Row 1: h(t,x) slices
     gs1 = gridspec.GridSpec(1, 2)
     gs1.update(top=1 - 1 / 2 - 0.05, bottom=0.15, left=0.15, right=0.85, wspace=0.5)
 
@@ -241,6 +276,10 @@ def plot_ac(mesh, preds, train_datasets, val_dataset, file_name):
 
 
 def plot_burgers_discrete_forward(mesh, preds, train_datasets, val_dataset, file_name):
+    """
+    Plot burgers discrete forward PDE
+    """
+    
     fig, ax = newfig(1.0, 1.2)
 
     x0 = train_datasets[0].spatial_domain_sampled[0].detach().numpy()
@@ -248,12 +287,11 @@ def plot_burgers_discrete_forward(mesh, preds, train_datasets, val_dataset, file
     exact_u = mesh.solution["u"]
     idx_t0 = train_datasets[0].idx_t
     idx_t1 = val_dataset.idx_t
-    # U1_pred = model([val_datasets.spatial_domain_sampled], None).cpu().detach().numpy()
     U1_pred = preds["u"]
 
     ax.axis("off")
 
-    ####### Row 0: h(t,x) ##################
+    # Row 0: h(t,x)
     gs0 = gridspec.GridSpec(1, 2)
     gs0.update(top=1 - 0.06, bottom=1 - 1 / 2 + 0.1, left=0.15, right=0.85, wspace=0)
     ax = plt.subplot(gs0[:, :])
@@ -284,7 +322,7 @@ def plot_burgers_discrete_forward(mesh, preds, train_datasets, val_dataset, file
     leg = ax.legend(frameon=False, loc="best")
     ax.set_title("$u(t,x)$", fontsize=10)
 
-    ####### Row 1: h(t,x) slices ##################
+    # Row 1: h(t,x) slices
     gs1 = gridspec.GridSpec(1, 2)
     gs1.update(top=1 - 1 / 2 - 0.05, bottom=0.15, left=0.15, right=0.85, wspace=0.5)
 
@@ -311,6 +349,10 @@ def plot_burgers_discrete_forward(mesh, preds, train_datasets, val_dataset, file
 
 
 def plot_burgers_discrete_inverse(mesh, preds, train_datasets, val_dataset, file_name):
+    """
+    Plot burgers continuous forward PDE
+    """
+    
     fig, ax = newfig(1.0, 1.2)
 
     x0 = train_datasets[0].spatial_domain_sampled[0].detach().numpy()
@@ -380,11 +422,15 @@ def plot_burgers_discrete_inverse(mesh, preds, train_datasets, val_dataset, file
 
 
 def plot_schrodinger(mesh, preds, train_datasets, val_dataset, file_name):
+    """
+    Plot schrodinger continuous forward PDE
+    """
+    
     h_pred = preds["h"]
     Exact_h = mesh.solution["h"]
     H_pred = h_pred.reshape(Exact_h.shape)
 
-    ####### Row 1: u(t,x) slices ##################
+    # Row 1: u(t,x) slices
     gs1 = gridspec.GridSpec(1, 3)
     gs1.update(top=1 - 1 / 3, bottom=0, left=0.1, right=0.9, wspace=0.5)
 
@@ -400,7 +446,7 @@ def plot_schrodinger(mesh, preds, train_datasets, val_dataset, file_name):
     fig, ax = newfig(1.0, 0.9)
     ax.axis("off")
 
-    ####### Row 0: h(t,x) ##################
+    # Row 0: h(t,x)
     gs0 = gridspec.GridSpec(1, 2)
     gs0.update(top=1 - 0.06, bottom=1 - 1 / 3, left=0.15, right=0.85, wspace=0)
     ax = plt.subplot(gs0[:, :])
@@ -436,7 +482,7 @@ def plot_schrodinger(mesh, preds, train_datasets, val_dataset, file_name):
     leg = ax.legend(frameon=False, loc="best")
     ax.set_title("$|h(t,x)|$", fontsize=10)
 
-    ####### Row 1: h(t,x) slices ##################
+    # Row 1: h(t,x) slices
     gs1 = gridspec.GridSpec(1, 3)
     gs1.update(top=1 - 1 / 3, bottom=0, left=0.1, right=0.9, wspace=0.5)
 
@@ -475,6 +521,10 @@ def plot_schrodinger(mesh, preds, train_datasets, val_dataset, file_name):
 
 
 def plot_burgers_continuous_forward(mesh, preds, train_datasets, val_dataset, file_name):
+    """
+    Plot burgers continuous forward PDE
+    """
+    
     U_pred = preds["u"]
     exact_u = mesh.solution["u"]
     x = mesh.spatial_domain[:]
@@ -490,7 +540,7 @@ def plot_burgers_continuous_forward(mesh, preds, train_datasets, val_dataset, fi
     fig, ax = newfig(1.5, 0.9)
     ax.axis("off")
 
-    ####### Row 0: u(t,x) ##################
+    # Row 0: u(t,x)
     gs0 = gridspec.GridSpec(1, 2)
     gs0.update(top=1 - 0.06, bottom=1 - 1 / 3, left=0.15, right=0.85, wspace=0)
     ax = plt.subplot(gs0[:, :])
@@ -531,7 +581,7 @@ def plot_burgers_continuous_forward(mesh, preds, train_datasets, val_dataset, fi
     ax.legend(frameon=False, loc="best")
     ax.set_title("$u(t,x)$", fontsize=10)
 
-    ####### Row 1: u(t,x) slices ##################
+    # Row 1: u(t,x) slices
     gs1 = gridspec.GridSpec(1, 3)
     gs1.update(top=1 - 1 / 3, bottom=0, left=0.1, right=0.9, wspace=0.5)
 
@@ -570,6 +620,10 @@ def plot_burgers_continuous_forward(mesh, preds, train_datasets, val_dataset, fi
 
 
 def plot_burgers_continuous_inverse(mesh, preds, train_datasets, val_datasets, file_name):
+    """
+    Plot burgers continuous inverse PDE
+    """
+    
     U_pred = preds["u"]
 
     exact_u = mesh.solution["u"]
@@ -582,7 +636,7 @@ def plot_burgers_continuous_inverse(mesh, preds, train_datasets, val_datasets, f
     fig, ax = newfig(1.0, 0.9)
     ax.axis("off")
 
-    ####### Row 0: u(t,x) ##################
+    # Row 0: u(t,x)
     gs0 = gridspec.GridSpec(1, 2)
     gs0.update(top=1 - 0.06, bottom=1 - 1 / 3, left=0.15, right=0.85, wspace=0)
     ax = plt.subplot(gs0[:, :])
@@ -623,7 +677,7 @@ def plot_burgers_continuous_inverse(mesh, preds, train_datasets, val_datasets, f
     ax.legend(frameon=False, loc="best")
     ax.set_title("$u(t,x)$", fontsize=10)
 
-    ####### Row 1: u(t,x) slices ##################
+    # Row 1: u(t,x) slices
     gs1 = gridspec.GridSpec(1, 3)
     gs1.update(top=1 - 1 / 3, bottom=0, left=0.1, right=0.9, wspace=0.5)
 

@@ -62,6 +62,16 @@ class RungeKutta(torch.nn.Module):
         self.irk = {key: tensor.to(device) for key, tensor in self.irk.items()}
 
     def forward(self, outputs, mode, solution_names, collection_points_names):
+        """
+        Perform a forward step using the Runge-Kutta method for solving differential equations.
+
+        :param outputs: Dictionary containing solution tensors and other variables.
+        :param mode: The mode of the forward step, e.g., "inverse_discrete_1", "inverse_discrete_2", "forward_discrete".
+        :param solution_names: List of keys for solution variables.
+        :param collection_points_names: List of keys for collection point variables.
+        :return: Dictionary with updated solution tensors after the forward step.
+        """
+        
         for solution_name, collection_points_name in zip(solution_names, collection_points_names):
             if mode == "inverse_discrete_1":
                 outputs[solution_name] = outputs[solution_name] - self.dt * torch.matmul(

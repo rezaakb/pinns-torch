@@ -9,6 +9,10 @@ from .sampler_base import SamplerBase
 
 
 class MeshSampler(SamplerBase):
+    """ 
+    Sample from Mesh for continous mode.
+    """
+    
     def __init__(
         self,
         mesh,
@@ -86,6 +90,9 @@ class MeshSampler(SamplerBase):
 
 
 class DiscreteMeshSampler(SamplerBase):
+    """ 
+    Sample from Mesh for discrete mode.
+    """
     def __init__(
         self,
         mesh,
@@ -123,15 +130,25 @@ class DiscreteMeshSampler(SamplerBase):
 
     @property
     def mode(self):
+        """
+        Get the current mode for RungeKutta class.
+    
+        :return: The current mode value.
+        """
         return self._mode
 
     @mode.setter
     def mode(self, value):
+        """
+        Set the mode value by PINNDataModule for RungeKutta class.
+    
+        :param value: The mode value to be set.
+        """
         self._mode = value
 
     def loss_fn(self, inputs, loss, **functions):
         """Compute the loss function based on inputs and functions. _mode is assigned in
-        PINNDataModule class It can be `inverse_discrete_1`, `inverse_discrete_2`, or
+        PINNDataModule class. It can be `inverse_discrete_1`, `inverse_discrete_2`, or
         `forward_discrete`
 
         :param inputs: Input data for computing the loss.

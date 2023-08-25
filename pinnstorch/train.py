@@ -167,7 +167,7 @@ def train(
     test_metrics = trainer.callback_metrics
 
     if cfg.get("plotting"):
-        log.info(f"Plotting the results")
+        log.info("Plotting the results")
         preds_list = trainer.predict(
             model=model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path")
         )

@@ -2,6 +2,16 @@ import torch
 
 
 def sse(loss, preds, target=None, keys=None, mid=None):
+    """
+    Calculate the sum of squared errors (SSE) loss for given predictions and optional targets.
+    
+    :param loss: Loss variable.
+    :param preds: Dictionary containing prediction tensors for different keys.
+    :param target: Dictionary containing target tensors (optional).
+    :param keys: List of keys for which to calculate SSE loss (optional).
+    :param mid: Index to separate predictions for mid-point calculation (optional).
+    :return: Calculated SSE loss.
+    """
     if keys is None:
         return loss
 
@@ -17,6 +27,16 @@ def sse(loss, preds, target=None, keys=None, mid=None):
 
 
 def mse(loss, preds, target=None, keys=None, mid=None):
+    """
+    Calculate the mean squared error (MSE) loss for given predictions and optional targets.
+    
+    :param loss: Loss variable.
+    :param preds: Dictionary containing prediction tensors for different keys.
+    :param target: Dictionary containing target tensors (optional).
+    :param keys: List of keys for which to calculate SSE loss (optional).
+    :param mid: Index to separate predictions for mid-point calculation (optional).
+    :return: Calculated MSE loss.
+    """
     if keys is None:
         return loss
 
@@ -32,10 +52,24 @@ def mse(loss, preds, target=None, keys=None, mid=None):
 
 
 def relative_l2_error(preds, target):
+    """
+    Calculate the relative L2 error between predictions and target tensors.
+    
+    :param preds: Predicted tensors.
+    :param target: Target tensors.
+    :return: Relative L2 error value.
+    """
     return torch.norm(preds - target, p=2) / torch.norm(target, p=2)
 
 
 def fix_extra_variables(extra_variables):
+    """
+    Convert extra variables to torch tensors with gradient tracking.
+    These variables are trainables in inverse problems.
+    
+    :param extra_variables: Dictionary of extra variables to be converted.
+    :return: Dictionary of converted extra variables as torch tensors with gradients.
+    """
     if extra_variables is None:
         return None
     extra_variables_parameters = {}

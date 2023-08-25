@@ -40,8 +40,8 @@ class FCN(nn.Module):
         input_layer = nn.Linear(layers[0], layers[1])
         initializer(input_layer.weight)
         
-        net.add_module(f"input", input_layer)
-        net.add_module(f"activation_1", nn.Tanh())
+        net.add_module("input", input_layer)
+        net.add_module("activation_1", nn.Tanh())
 
         for i in range(1, len(layers) - 2):
             hidden_layer = nn.Linear(layers[i], layers[i + 1])
@@ -121,9 +121,9 @@ class NetHFM(nn.Module):
         self.biases = []
         self.gammas = []
 
-        for l in range(0, self.num_layers - 1):
-            in_dim = layers[l]
-            out_dim = layers[l + 1]
+        for i in range(0, self.num_layers - 1):
+            in_dim = layers[i]
+            out_dim = layers[i + 1]
             W = np.random.normal(size=[in_dim, out_dim])
             b = np.zeros([1, out_dim])
             g = np.ones([1, out_dim])
