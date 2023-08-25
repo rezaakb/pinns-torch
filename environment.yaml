@@ -44,3 +44,4 @@ dependencies:
       - rootutils
       - PyDOE
       - scipy
+      - matplotlib

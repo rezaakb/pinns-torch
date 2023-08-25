@@ -1,1 +1,1 @@
-from .train import train
+from pinnstorch.train import train
