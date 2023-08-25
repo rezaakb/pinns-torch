@@ -48,8 +48,8 @@ cd pinnstorch
 conda create -n myenv python=3.9
 conda activate myenv
 
-# install requirements
-pip install -r requirements.txt```
+# install package
+pip install . -e
 ````
 
 ## Quick start
@@ -81,3 +81,9 @@ Distributed under the terms of the \[BSD-3\] license, "pinnstorch" is free and o
 ## Resources
 
 We employed [this template](https://github.com/ashleve/lightning-hydra-template) to develop the package, drawing from its structure and design principles. For a deeper understanding, we recommend visiting their GitHub repository.
+
+## Citation
+
+```
+...
+```

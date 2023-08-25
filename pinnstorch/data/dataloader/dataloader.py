@@ -3,6 +3,7 @@ import torch
 
 class PINNDataLoader:
     """Custom DataLoader for the PINN datasets.
+
     This allows you to have a fast dataloader.
     """
 
