@@ -24,4 +24,3 @@ Here's how to use the class provided by this module:
     output_names = ['u', 'v'],
     discrete = False
    )
-

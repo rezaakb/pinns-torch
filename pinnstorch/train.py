@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple, Callable, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import hydra
 import lightning as L
@@ -8,11 +8,17 @@ from lightning import Callback, LightningDataModule, LightningModule, Trainer
 from lightning.pytorch.loggers import Logger
 from omegaconf import DictConfig, OmegaConf
 
-
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
 from pinnstorch import utils
-from pinnstorch.data import PointCloud, Mesh, TimeDomain, Interval, Rectangle, RectangularPrism
+from pinnstorch.data import (
+    Interval,
+    Mesh,
+    PointCloud,
+    Rectangle,
+    RectangularPrism,
+    TimeDomain,
+)
 
 log = utils.get_pylogger(__name__)
 
@@ -21,10 +27,7 @@ OmegaConf.register_new_resolver("eval", eval)
 
 @utils.task_wrapper
 def train(
-    cfg: DictConfig,
-    read_data_fn: Callable,
-    pde_fn: Callable,
-    output_fn: Callable = None
+    cfg: DictConfig, read_data_fn: Callable, pde_fn: Callable, output_fn: Callable = None
 ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     """Trains the model. Can additionally evaluate on a testset, using best weights obtained during
     training.
@@ -61,7 +64,9 @@ def train(
 
     if cfg.get("spatial_domain"):
         log.info(f"Instantiating spatial domain <{cfg.spatial_domain._target_}>")
-        sd: Union[Interval, Rectangle, RectangularPrism] = hydra.utils.instantiate(cfg.spatial_domain)
+        sd: Union[Interval, Rectangle, RectangularPrism] = hydra.utils.instantiate(
+            cfg.spatial_domain
+        )
 
     log.info(f"Instantiating mesh <{cfg.mesh._target_}>")
     if cfg.mesh._target_ == "pinnstorch.data.Mesh":
@@ -69,9 +74,7 @@ def train(
             cfg.mesh, time_domain=td, spatial_domain=sd, read_data_fn=read_data_fn
         )
     elif cfg.mesh._target_ == "pinnstorch.data.PointCloud":
-        mesh: PointCloud = hydra.utils.instantiate(
-            cfg.mesh, read_data_fn=read_data_fn
-        )
+        mesh: PointCloud = hydra.utils.instantiate(cfg.mesh, read_data_fn=read_data_fn)
     else:
         raise "Mesh should be defined in config file."
 
