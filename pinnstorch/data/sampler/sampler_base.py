@@ -4,6 +4,8 @@ from torch.utils.data import Dataset
 
 
 class SamplerBase(Dataset):
+    """Other classes will be used this helper class."""
+
     def __init__(self):
         """Base class for sampling mesh data for training.
 

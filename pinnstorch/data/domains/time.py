@@ -2,6 +2,8 @@ import numpy as np
 
 
 class TimeDomain:
+    """Initialize a time domain."""
+
     def __init__(self, t_interval, t_points: int):
         """Initialize a TimeDomain object to represent a time domain.
 

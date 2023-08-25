@@ -2,6 +2,8 @@ import numpy as np
 
 
 class Interval:
+    """Initialize a 1D spatial interval."""
+
     def __init__(self, x_interval, shape):
         """Initialize an Interval object to represent a 1D spatial interval.
 
@@ -43,6 +45,8 @@ class Interval:
 
 
 class Rectangle:
+    """Initialize a 2D spatial domain."""
+
     def __init__(self, x_interval, y_interval, shape):
         """Initialize a Rectangle object to represent a 2D spatial rectangle.
 
@@ -93,6 +97,8 @@ class Rectangle:
 
 
 class RectangularPrism:
+    """Initialize a 3D spatial domain."""
+
     def __init__(self, x_interval, y_interval, z_interval, shape):
         """Initialize a Rectangular Prism object to represent a three-dimensional shape.
 

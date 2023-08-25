@@ -7,6 +7,8 @@ from .sampler_base import SamplerBase
 
 
 class DirichletBoundaryCondition(SamplerBase):
+    """Initialize Dirichlet boundary condition.
+    """
     def __init__(
         self,
         mesh,
@@ -117,6 +119,8 @@ class DirichletBoundaryCondition(SamplerBase):
 
 
 class PeriodicBoundaryCondition(SamplerBase):
+    """Initialize Periodic boundary condition.
+    """
     def __init__(
         self,
         mesh,

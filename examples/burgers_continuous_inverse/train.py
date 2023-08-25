@@ -10,6 +10,12 @@ import pinnstorch
 
 
 def read_data_fn(root_path):
+    """Read and preprocess data from the specified root path.
+
+    :param root_path: The root directory containing the data.
+    :return: Processed data will be used in Mesh class.
+    """
+    
     data = pinnstorch.utils.load_data(root_path, "burgers_shock.mat")
     exact_u = np.real(data["usol"])
 
@@ -17,6 +23,9 @@ def read_data_fn(root_path):
 
 
 def pde_fn(outputs, x, t, extra_variables):
+    """Define the partial differential equations (PDEs).
+    """
+    
     u_x, u_t = pinnstorch.utils.gradient(outputs["u"], [x, t])
     u_xx = pinnstorch.utils.gradient(u_x, x)
     outputs["f"] = (

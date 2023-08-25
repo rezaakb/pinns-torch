@@ -18,6 +18,13 @@ class PINNDataLoader:
     """
 
     def __init__(self, dataset, batch_size=None, ignore=False, shuffle=False):
+        """Initialize a PINNDataLoader.
+
+        :param dataset: The dataset to load data from.
+        :param batch_size: The batch size for the dataloader.
+        :param ignore: Whether to ignore incomplete batches (default is False).
+        :param shuffle: Whether to shuffle the dataset (default is False).
+        """
         self.dataset = dataset
         self.batch_size = batch_size
         self.dataset_size = len(self.dataset)
@@ -31,6 +38,10 @@ class PINNDataLoader:
             self.indices = torch.arange(self.dataset_size)
 
     def __len__(self):
+        """Get the number of batches in the dataloader.
+
+        :return: The number of batches.
+        """
         if self.batch_size is None:
             return 1
         if self.ignore:
@@ -39,10 +50,18 @@ class PINNDataLoader:
             return (self.dataset_size // self.batch_size) + 1
 
     def __iter__(self):
+        """Initialize the data loader iterator.
+
+        :return: The data loader iterator.
+        """
         self.current_index = 0
         return self
 
     def __next__(self):
+        """Generate the next batch of data.
+
+        :return: The next batch of data.
+        """
         if self.current_index >= len(self.indices):
             raise StopIteration
 

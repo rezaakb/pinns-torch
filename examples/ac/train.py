@@ -10,12 +10,21 @@ import pinnstorch
 
 
 def read_data_fn(root_path):
+    """Read and preprocess data from the specified root path.
+
+    :param root_path: The root directory containing the data.
+    :return: Processed data will be used in Mesh class.
+    """
+    
     data = pinnstorch.utils.load_data(root_path, "AC.mat")
     exact_u = np.real(data["uu"])
     return {"u": exact_u}
 
 
 def pde_fn(outputs, x, extra_variables):
+    """Define `output_fn` funtion that will be applied to outputs of net.
+    """
+    
     u = outputs["u"][:, :-1]
     u_x = pinnstorch.utils.fwd_gradient(u, x)
     u_xx = pinnstorch.utils.fwd_gradient(u_x, x)

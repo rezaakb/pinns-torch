@@ -10,12 +10,21 @@ import pinnstorch
 
 
 def read_data_fn(root_path):
+    """Read and preprocess data from the specified root path.
+
+    :param root_path: The root directory containing the data.
+    :return: Processed data will be used in Mesh class.
+    """
+    
     data = pinnstorch.utils.load_data(root_path, "KdV.mat")
     exact_u = np.real(data["uu"]).astype("float32")
     return {"u": exact_u}
 
 
 def pde_fn(outputs, x, extra_variables):
+    """Define the partial differential equations (PDEs).
+    """
+    
     U = outputs["u"]
     U_x = pinnstorch.utils.fwd_gradient(U, x)
     U_xx = pinnstorch.utils.fwd_gradient(U_x, x)

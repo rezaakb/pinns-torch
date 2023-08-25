@@ -10,6 +10,12 @@ import pinnstorch
 
 
 def read_data_fn(root_path):
+    """Read and preprocess data from the specified root path.
+
+    :param root_path: The root directory containing the data.
+    :return: Processed data will be used in Mesh class.
+    """
+    
     data = pinnstorch.utils.load_data(root_path, "NLS.mat")
     exact = data["uu"]
     exact_u = np.real(exact)
@@ -19,12 +25,18 @@ def read_data_fn(root_path):
 
 
 def output_fn(outputs, x, t):
+    """Define `output_fn` funtion that will be applied to outputs of net.
+    """
+    
     outputs["h"] = torch.sqrt(outputs["u"] ** 2 + outputs["v"] ** 2)
 
     return outputs
 
 
 def pde_fn(outputs, x, t, extra_variables=None):
+    """Define the partial differential equations (PDEs).
+    """
+    
     u_x, u_t = pinnstorch.utils.gradient(outputs["u"], [x, t])
     v_x, v_t = pinnstorch.utils.gradient(outputs["v"], [x, t])
 
