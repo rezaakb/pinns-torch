@@ -8,6 +8,38 @@ from omegaconf import DictConfig, open_dict
 from pinnstorch.train import train
 from tests.helpers.run_if import RunIf
 
+from typing import Any, Dict, List, Optional, Tuple
+
+import hydra
+import numpy as np
+import rootutils
+import torch
+from omegaconf import DictConfig
+
+import pinnstorch
+
+
+def read_data_fn(root_path):
+    """Read and preprocess data from the specified root path.
+
+    :param root_path: The root directory containing the data.
+    :return: Processed data will be used in Mesh class.
+    """
+    
+    data = pinnstorch.utils.load_data(root_path, "AC.mat")
+    exact_u = np.real(data["uu"])
+    return {"u": exact_u}
+
+
+def pde_fn(outputs, x, extra_variables):
+    """Define the partial differential equations (PDEs)."""
+    
+    u = outputs["u"][:, :-1]
+    u_x = pinnstorch.utils.fwd_gradient(u, x)
+    u_xx = pinnstorch.utils.fwd_gradient(u_x, x)
+    outputs["f"] = 5.0 * u - 5.0 * u**3 + 0.0001 * u_xx
+    return outputs
+
 
 def test_train_fast_dev_run(cfg_train: DictConfig) -> None:
     """Run for 1 train, val and test step.
@@ -18,7 +50,7 @@ def test_train_fast_dev_run(cfg_train: DictConfig) -> None:
     with open_dict(cfg_train):
         cfg_train.trainer.fast_dev_run = True
         cfg_train.trainer.accelerator = "cpu"
-    train(cfg_train)
+    train(cfg_train, read_data_fn = read_data_fn, pde_fn = pde_fn)
 
 
 @RunIf(min_gpus=1)
@@ -31,7 +63,7 @@ def test_train_fast_dev_run_gpu(cfg_train: DictConfig) -> None:
     with open_dict(cfg_train):
         cfg_train.trainer.fast_dev_run = True
         cfg_train.trainer.accelerator = "gpu"
-    train(cfg_train)
+    train(cfg_train, read_data_fn = read_data_fn, pde_fn = pde_fn)
 
 
 @RunIf(min_gpus=1)
@@ -46,7 +78,7 @@ def test_train_epoch_gpu_amp(cfg_train: DictConfig) -> None:
         cfg_train.trainer.max_epochs = 1
         cfg_train.trainer.accelerator = "cpu"
         cfg_train.trainer.precision = 16
-    train(cfg_train)
+    train(cfg_train, read_data_fn = read_data_fn, pde_fn = pde_fn)
 
 
 @pytest.mark.slow
@@ -59,7 +91,7 @@ def test_train_epoch_double_val_loop(cfg_train: DictConfig) -> None:
     with open_dict(cfg_train):
         cfg_train.trainer.max_epochs = 1
         cfg_train.trainer.val_check_interval = 0.5
-    train(cfg_train)
+    train(cfg_train, read_data_fn = read_data_fn, pde_fn = pde_fn)
 
 
 @pytest.mark.slow
@@ -74,7 +106,7 @@ def test_train_ddp_sim(cfg_train: DictConfig) -> None:
         cfg_train.trainer.accelerator = "cpu"
         cfg_train.trainer.devices = 2
         cfg_train.trainer.strategy = "ddp_spawn"
-    train(cfg_train)
+    train(cfg_train, read_data_fn = read_data_fn, pde_fn = pde_fn)
 
 
 @pytest.mark.slow
