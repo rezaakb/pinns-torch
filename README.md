@@ -16,7 +16,7 @@
 
 ## Description
 
-Our package introduces Physics-Informed Neural Networks (PINNs) implemented using PyTorch. The standout feature is the incorporation of CUDAGraphs for compiling models, resulting in significant performance gains of 3x to 10x compared to traditional PyTorch implementations.
+Our package introduces Physics-Informed Neural Networks (PINNs) implemented using PyTorch. The standout feature is the incorporation of CUDAGraphs for compiling models, resulting in significant performance gains of 3x to 15x compared to traditional PyTorch implementations.
 
 <div align="center">
 <img src="http://drive.google.com/uc?export=view&id=1qbDpnSZiDRm5CQKjAUkNsfYcDqLEShQA" width="500">
@@ -40,7 +40,7 @@ pip install pinnstorch
 
 If you intend to introduce new functionalities or make code modifications, we suggest duplicating the repository and setting up a local installation:
 
-````bash
+```bash
 git clone https://github.com/rezaakb/pinnstorch
 cd pinnstorch
 
@@ -50,7 +50,7 @@ conda activate myenv
 
 # install package
 pip install . -e
-````
+```
 
 ## Quick start
 
