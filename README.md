@@ -49,7 +49,7 @@ conda create -n myenv python=3.9
 conda activate myenv
 
 # install package
-pip install . -e
+pip install -e .
 ```
 
 ## Quick start
