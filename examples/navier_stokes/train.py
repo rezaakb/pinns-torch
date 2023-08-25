@@ -15,7 +15,7 @@ def read_data_fn(root_path):
     :param root_path: The root directory containing the data.
     :return: Processed data in the form of a PointCloudData object.
     """
-    
+
     data = pinnstorch.utils.load_data(root_path, "cylinder_nektar_wake.mat")
     x = data["X_star"][:, 0:1]  # N x 1
     y = data["X_star"][:, 1:2]  # N x 1
@@ -30,8 +30,7 @@ def read_data_fn(root_path):
 
 
 def output_fn(outputs, x, y, t):
-    """Define `output_fn` funtion that will be applied to outputs of net.
-    """
+    """Define `output_fn` function that will be applied to outputs of net."""
     outputs["u"] = pinnstorch.utils.gradient(outputs["psi"], y)
     outputs["v"] = -pinnstorch.utils.gradient(outputs["psi"], x)
 
@@ -39,9 +38,8 @@ def output_fn(outputs, x, y, t):
 
 
 def pde_fn(outputs, x, y, t, extra_variables):
-    """Define the partial differential equations (PDEs).
-    """
-    
+    """Define the partial differential equations (PDEs)."""
+
     u_x, u_y, u_t = pinnstorch.utils.gradient(outputs["u"], [x, y, t])
     u_xx = pinnstorch.utils.gradient(u_x, x)
     u_yy = pinnstorch.utils.gradient(u_y, y)

@@ -2,8 +2,7 @@ from torch import autograd, ones_like
 
 
 def gradient(dy, dx, ones_like_tensor=None, create_graph=True):
-    """
-    Compute the gradient of a tensor `dy` with respect to another tensor `dx`.
+    """Compute the gradient of a tensor `dy` with respect to another tensor `dx`.
 
     :param dy: The tensor to compute the gradient for.
     :param dx: The tensor with respect to which the gradient is computed.
@@ -27,8 +26,7 @@ def gradient(dy, dx, ones_like_tensor=None, create_graph=True):
 
 
 def fwd_gradient(dy, dx):
-    """
-    Compute the forward gradient of a tensor `dy` with respect to another tensor `dx`.
+    """Compute the forward gradient of a tensor `dy` with respect to another tensor `dx`.
 
     :param dy: The tensor to compute the forward gradient for.
     :param dx: The tensor with respect to which the forward gradient is computed.

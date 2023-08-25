@@ -22,8 +22,7 @@ def read_data_fn(root_path):
 
 
 def pde_fn(outputs, x, extra_variables):
-    """Define `output_fn` funtion that will be applied to outputs of net.
-    """
+    """Define the partial differential equations (PDEs)."""
     
     u = outputs["u"][:, :-1]
     u_x = pinnstorch.utils.fwd_gradient(u, x)

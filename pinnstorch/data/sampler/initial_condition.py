@@ -5,8 +5,8 @@ from .sampler_base import SamplerBase
 
 
 class InitialCondition(SamplerBase):
-    """Initialize initial boundary condition.
-    """
+    """Initialize initial boundary condition."""
+
     def __init__(self, mesh, num_sample=None, solution=None, initial_fun=None):
         """Initialize an InitialCondition object for sampling initial condition data.
 

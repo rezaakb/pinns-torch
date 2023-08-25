@@ -11,8 +11,8 @@ log = logging.getLogger(__name__)
 
 
 class RungeKutta(torch.nn.Module):
-    """Initialize Runge Kutta method based on time interval and q.
-    """
+    """Initialize Runge Kutta method based on time interval and q."""
+
     def __init__(self, root_dir, t1: int, t2: int, time_domain, q: int = None):
         """Initialize a RungeKutta object for solving differential equations using Implicit Runge-
         Kutta methods.

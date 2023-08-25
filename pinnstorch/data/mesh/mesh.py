@@ -8,8 +8,8 @@ from pinnstorch.data import Interval, Rectangle, RectangularPrism, TimeDomain
 
 
 class MeshBase:
-    """ Mesh and PointCloud classes will be used this helper class.
-    """
+    """Mesh and PointCloud classes will be used this helper class."""
+
     def __init__():
         """Base class for generating mesh data and boundary conditions."""
 
@@ -117,9 +117,11 @@ class MeshBase:
 
 
 class Mesh(MeshBase):
-    """ For using this class you should define a SpatialDomain and TimeDomain classes.
+    """For using this class you should define a SpatialDomain and TimeDomain classes.
+
     If dimentions of mesh is not determined, it is better to use PointCloud.
     """
+
     def __init__(
         self,
         spatial_domain: Union[Interval, Rectangle, RectangularPrism],
@@ -157,8 +159,9 @@ class Mesh(MeshBase):
 
 
 class PointCloud(MeshBase):
-    """ For using this class you should define a mesh of spatial domain, time domain, and solutions.
-    """
+    """For using this class you should define a mesh of spatial domain, time domain, and
+    solutions."""
+
     def __init__(self, root_dir: str, read_data_fn: Callable, ub: List = None, lb: List = None):
         """Generate a point cloud mesh and load data from files.
 
