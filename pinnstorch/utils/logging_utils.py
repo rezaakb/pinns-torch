@@ -5,7 +5,6 @@ from omegaconf import OmegaConf
 
 from pinnstorch.utils import pylogger
 
-
 log = pylogger.get_pylogger(__name__)
 
 

@@ -1,3 +1,0 @@
-- trainer.max_epochs=400000
-- trainer.check_val_every_n_epoch=10000
-- trainer.devices=1

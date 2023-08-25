@@ -1,13 +1,13 @@
 from typing import Any, Dict, Optional, Tuple
 
-import torch
 import numpy as np
-
+import torch
 from lightning import LightningDataModule
-from torch.utils.data import Dataset
 from lightning.pytorch.utilities.combined_loader import CombinedLoader
+from torch.utils.data import Dataset
 
 from .dataloader.dataloader import PINNDataLoader
+
 
 class PINNDataModule(LightningDataModule):
     """`LightningDataModule` for the PINN dataset.
@@ -53,8 +53,8 @@ class PINNDataModule(LightningDataModule):
         self,
         train_datasets,
         val_dataset,
-        test_dataset = None,
-        pred_dataset = None,
+        test_dataset=None,
+        pred_dataset=None,
         batch_size: int = None,
         num_workers: int = 0,
         pin_memory: bool = False,
@@ -65,27 +65,29 @@ class PINNDataModule(LightningDataModule):
         :param val_dataset: validation dataset.
         """
         super().__init__()
-        
+
         self.train_datasets = train_datasets
         self.val_dataset = val_dataset
         self.test_dataset = test_dataset
         self.pred_dataset = pred_dataset
-        
+
         if isinstance(val_dataset, list):
             raise "Validation dataset cannot be a list."
-        
+
         self.batch_size = batch_size
 
         # this line allows to access init params with 'self.hparams' attribute
         # also ensures init params will be stored in ckpt
         self.save_hyperparameters(logger=False)
 
-    
         self.data_train: Optional[Dataset] = None
         self.data_val: Optional[Dataset] = self.val_dataset
-        self.data_test: Optional[Dataset] = self.test_dataset if self.test_dataset else self.val_dataset
-        self.data_pred: Optional[Dataset] = self.pred_dataset if self.pred_dataset else self.val_dataset
-
+        self.data_test: Optional[Dataset] = (
+            self.test_dataset if self.test_dataset else self.val_dataset
+        )
+        self.data_pred: Optional[Dataset] = (
+            self.pred_dataset if self.pred_dataset else self.val_dataset
+        )
 
     def setup_(self, stage: Optional[str] = None) -> None:
         """Load data. Set variables: `self.data_train`, `self.data_val`, `self.data_test`.
@@ -103,24 +105,26 @@ class PINNDataModule(LightningDataModule):
             self.data_train = {}
             mesh_idx = self.find_discrete_mesh()
             j = 0
-            
+
             for train_dataset in self.train_datasets:
                 name = type(train_dataset).__name__
-                
+
                 ## Add order of gradient to Periodic Boundary Condition
-                if name == 'PeriodicBoundaryCondition':
+                if name == "PeriodicBoundaryCondition":
                     name = f"{name}_{train_dataset.derivative_order}"
-    
+
                 ## Add branch name to mesh sampler.
-                if name == 'MeshSampler':
+                if name == "MeshSampler":
                     if train_dataset.use_data and train_dataset.idx_t is None:
                         name = f"{name}_{'use_data'}"
                     else:
                         name = f"{name}_{mesh_idx[j]}"
-                    j = j+1
-                    
-                self.data_train[name] = PINNDataLoader(train_dataset, batch_size=len(train_dataset))
-    
+                    j = j + 1
+
+                self.data_train[name] = PINNDataLoader(
+                    train_dataset, batch_size=len(train_dataset)
+                )
+
     def setup(self, stage: Optional[str] = None) -> None:
         """Load data. Set variables: `self.data_train`, `self.data_val`, `self.data_test`.
 
@@ -131,39 +135,39 @@ class PINNDataModule(LightningDataModule):
 
         :param stage: The stage to setup. Either `"fit"`, `"validate"`, `"test"`, or `"predict"`. Defaults to ``None``.
         """
-    
+
         # load and split datasets only if not loaded already
         if not self.data_train:
             self.data_train = {}
             self.set_mode_for_discrete_mesh()
-            
-            for train_dataset in self.train_datasets:  
 
-                self.data_train[train_dataset.loss_fn] = PINNDataLoader(train_dataset,
-                                                                        batch_size=self.batch_size,
-                                                                        ignore=True,
-                                                                        shuffle=True)
-               
+            for train_dataset in self.train_datasets:
+                self.data_train[train_dataset.loss_fn] = PINNDataLoader(
+                    train_dataset, batch_size=self.batch_size, ignore=True, shuffle=True
+                )
 
-            
     def set_mode_for_discrete_mesh(self):
         """This function will figuere out which training datasets are for discrete.
+
         Then set the mode value that will be used for Runge–Kutta methods
         """
 
-        mesh_idx = [(train_dataset.idx_t, train_dataset) for train_dataset in self.train_datasets
-                    if type(train_dataset).__name__ == 'DiscreteMeshSampler']
+        mesh_idx = [
+            (train_dataset.idx_t, train_dataset)
+            for train_dataset in self.train_datasets
+            if type(train_dataset).__name__ == "DiscreteMeshSampler"
+        ]
 
         mesh_idx = sorted(mesh_idx, key=lambda x: x[0])
-        
+
         if len(mesh_idx) == 1:
-            mesh_idx[0][1].mode = 'forward_discrete'
+            mesh_idx[0][1].mode = "forward_discrete"
         elif len(mesh_idx) == 2:
-            mesh_idx[0][1].mode = 'inverse_discrete_1'
-            mesh_idx[1][1].mode = 'inverse_discrete_2'
+            mesh_idx[0][1].mode = "inverse_discrete_1"
+            mesh_idx[1][1].mode = "inverse_discrete_2"
 
         mesh_idx.clear()
-    
+
     def train_dataloader(self):
         """Create and return the train dataloader.
 
@@ -172,36 +176,44 @@ class PINNDataModule(LightningDataModule):
         return self.data_train
 
     def val_dataloader(self):
-        """Create and return the validation dataloader. 
-        `self.loss_fn` and `self.solution` will be used in `PINNModule`. Lightning does not allow multiple val datasets.
+        """Create and return the validation dataloader. `self.loss_fn` and `self.solution` will be
+        used in `PINNModule`. Lightning does not allow multiple val datasets.
 
         :return: The validation dataloader.
         """
 
         self.loss_fn = self.data_val.loss_fn
         self.solution_names = self.data_val.solution_names
-        
+
         return PINNDataLoader(self.data_val, batch_size=self.batch_size, shuffle=False)
 
     def test_dataloader(self):
-        """Create and return the test dataloader.
-        `self.loss_fn` and `self.solution` will be used in `PINNModule`. Lightning does not allow multiple val datasets.
+        """Create and return the test dataloader. `self.loss_fn` and `self.solution` will be used
+        in `PINNModule`. Lightning does not allow multiple val datasets.
 
         :return: The test dataloader.
         """
         self.loss_fn = self.test_dataset.loss_fn if self.test_dataset else self.val_dataset.loss_fn
-        self.solution_names = self.test_dataset.solution_names if self.test_dataset else self.val_dataset.solution_names
-        
+        self.solution_names = (
+            self.test_dataset.solution_names
+            if self.test_dataset
+            else self.val_dataset.solution_names
+        )
+
         return PINNDataLoader(self.data_test, batch_size=self.batch_size, shuffle=False)
 
     def predict_dataloader(self):
-        """Create and return the test dataloader.
-        `self.loss_fn` and `self.solution` will be used in `PINNModule`. Lightning does not allow multiple val datasets.
+        """Create and return the test dataloader. `self.loss_fn` and `self.solution` will be used
+        in `PINNModule`. Lightning does not allow multiple val datasets.
 
         :return: The test dataloader.
         """
         self.loss_fn = self.pred_dataset.loss_fn if self.pred_dataset else self.val_dataset.loss_fn
-        self.solution_names = self.pred_dataset.solution_names if self.pred_dataset else self.val_dataset.solution_names
+        self.solution_names = (
+            self.pred_dataset.solution_names
+            if self.pred_dataset
+            else self.val_dataset.solution_names
+        )
 
         return PINNDataLoader(self.data_pred, batch_size=self.batch_size, shuffle=False)
 

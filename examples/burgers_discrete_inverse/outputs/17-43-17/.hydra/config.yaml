@@ -1,6 +1,6 @@
 task_name: burgers_discrete_inverse
 tags:
-- dev
+  - dev
 train: true
 test: false
 compile: false
@@ -26,14 +26,14 @@ net:
   _target_: src.models.net.neural_net.FCN
   _partial_: true
   layers:
-  - 1
-  - 50
-  - 50
-  - 50
-  - 50
-  - ${q}
+    - 1
+    - 50
+    - 50
+    - 50
+    - 50
+    - ${q}
   output_names:
-  - u
+    - u
   discrete: ${discrete}
 callbacks:
   model_checkpoint:
@@ -61,7 +61,7 @@ logger:
     _target_: lightning.pytorch.loggers.csv_logs.CSVLogger
     save_dir: ${paths.output_dir}
     name: csv/
-    prefix: ''
+    prefix: ""
 trainer:
   _target_: lightning.pytorch.trainer.Trainer
   default_root_dir: ${paths.output_dir}
@@ -69,7 +69,7 @@ trainer:
   max_epochs: 50000
   accelerator: gpu
   devices:
-  - 0
+    - 0
   check_val_every_n_epoch: 1000
   log_every_n_steps: 1
   deterministic: false
@@ -93,17 +93,17 @@ discrete: true
 time_domain:
   _target_: src.data.domains.time.TimeDomain
   t_interval:
-  - 0
-  - 0.99
+    - 0
+    - 0.99
   t_points: 100
 spatial_domain:
   _target_: src.data.domains.spatial.Interval
   x_interval:
-  - -1
-  - 1
+    - -1
+    - 1
   shape:
-  - 256
-  - 1
+    - 256
+    - 1
 mesh:
   _target_: src.data.mesh.mesh.Mesh
   root_dir: ${paths.data_dir}
@@ -116,37 +116,37 @@ runge_kutta:
   t2: ${idx_t1}
   time_domain: ${time_domain}
 train_datasets:
-- mesh_sampler:
-    _target_: src.data.sampler.mesh_sampler.DiscreteMeshSampler
-    _partial_: true
-    num_sample: ${N0}
-    idx_t: ${idx_t0}
-    solution:
-    - u
-    collection_points:
-    - f
-- mesh_sampler:
-    _target_: src.data.sampler.mesh_sampler.DiscreteMeshSampler
-    _partial_: true
-    num_sample: ${N1}
-    idx_t: ${idx_t1}
-    solution:
-    - u
-    collection_points:
-    - f
+  - mesh_sampler:
+      _target_: src.data.sampler.mesh_sampler.DiscreteMeshSampler
+      _partial_: true
+      num_sample: ${N0}
+      idx_t: ${idx_t0}
+      solution:
+        - u
+      collection_points:
+        - f
+  - mesh_sampler:
+      _target_: src.data.sampler.mesh_sampler.DiscreteMeshSampler
+      _partial_: true
+      num_sample: ${N1}
+      idx_t: ${idx_t1}
+      solution:
+        - u
+      collection_points:
+        - f
 val_dataset:
-- mesh_sampler:
-    _target_: src.data.sampler.mesh_sampler.DiscreteMeshSampler
-    _partial_: true
-    idx_t: ${idx_t1}
-    solution:
-    - u
+  - mesh_sampler:
+      _target_: src.data.sampler.mesh_sampler.DiscreteMeshSampler
+      _partial_: true
+      idx_t: ${idx_t1}
+      solution:
+        - u
 optimized_metric:
   error:
-  - u
+    - u
   extra_variables:
-  - l1
-  - l2
+    - l1
+    - l2
 plotting:
   _target_: src.utils.plotting.plot_burgers_discrete_inverse
   _partial_: true

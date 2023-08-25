@@ -1,26 +1,26 @@
 from typing import Any, Dict, List, Optional, Tuple
 
 import hydra
+import numpy as np
 import rootutils
 import torch
-import pinnstorch
-import numpy as np
-
 from omegaconf import DictConfig
 
+import pinnstorch
+
+
 def read_data_fn(root_path):
-    data = pinnstorch.utils.load_data(root_path, 'KdV.mat')
-    exact_u = np.real(data['uu']).astype('float32')
-    return {'u': exact_u}
+    data = pinnstorch.utils.load_data(root_path, "KdV.mat")
+    exact_u = np.real(data["uu"]).astype("float32")
+    return {"u": exact_u}
 
 
 def pde_fn(outputs, x, extra_variables):
-    U = outputs['u']
+    U = outputs["u"]
     U_x = pinnstorch.utils.fwd_gradient(U, x)
     U_xx = pinnstorch.utils.fwd_gradient(U_x, x)
-    U_xxx = pinnstorch.utils.fwd_gradient(U_xx, x)        
-    outputs['f'] = - extra_variables['l1'] * U * U_x - \
-                   torch.exp(extra_variables['l2']) * U_xxx
+    U_xxx = pinnstorch.utils.fwd_gradient(U_xx, x)
+    outputs["f"] = -extra_variables["l1"] * U * U_x - torch.exp(extra_variables["l2"]) * U_xxx
     return outputs
 
 
@@ -31,16 +31,15 @@ def main(cfg: DictConfig) -> Optional[float]:
     :param cfg: DictConfig configuration composed by Hydra.
     :return: Optional[float] with optimized metric value.
     """
-    
+
     # apply extra utilities
     # (e.g. ask for tags if none are provided in cfg, print cfg tree, etc.)
     pinnstorch.utils.extras(cfg)
 
     # train the model
-    metric_dict, _ = pinnstorch.train(cfg,
-                                      read_data_fn = read_data_fn,
-                                      pde_fn = pde_fn,
-                                      output_fn = None)
+    metric_dict, _ = pinnstorch.train(
+        cfg, read_data_fn=read_data_fn, pde_fn=pde_fn, output_fn=None
+    )
 
     # safely retrieve metric value for hydra-based hyperparameter optimization
     metric_value = pinnstorch.utils.get_metric_value(

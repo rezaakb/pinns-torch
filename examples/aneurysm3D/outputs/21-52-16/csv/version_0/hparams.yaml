@@ -20,7 +20,7 @@ trainer:
   max_epochs: 140
   accelerator: gpu
   devices:
-  - 0
+    - 0
   check_val_every_n_epoch: 1
   deterministic: false
 callbacks:
@@ -62,6 +62,6 @@ extras:
   print_config: true
 task_name: aneurysm3D
 tags:
-- dev
+  - dev
 ckpt_path: null
 seed: null

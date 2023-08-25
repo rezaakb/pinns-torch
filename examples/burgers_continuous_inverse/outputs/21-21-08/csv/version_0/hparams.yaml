@@ -23,7 +23,7 @@ trainer:
   max_epochs: 30000
   accelerator: gpu
   devices:
-  - 0
+    - 0
   check_val_every_n_epoch: 1000
   deterministic: false
 callbacks:
@@ -53,6 +53,6 @@ extras:
   print_config: true
 task_name: burgers_continuous_inverse
 tags:
-- dev
+  - dev
 ckpt_path: null
 seed: 1234

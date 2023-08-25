@@ -11,7 +11,6 @@ from rich.prompt import Prompt
 
 from pinnstorch.utils import pylogger
 
-
 log = pylogger.get_pylogger(__name__)
 
 

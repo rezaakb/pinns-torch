@@ -4,87 +4,87 @@
 [[36m2023-08-22 21:40:38,307[0m][[34msrc.utils.rich_utils[0m][[33mWARNING[0m] - Field 'logger' not found in config. Skipping 'logger' config printing...[0m
 CONFIG
 ├── data
-│   └── _target_: src.data.pinn_datamodule.PINNDataModule                       
-│                                                                               
+│   └── _target_: src.data.pinn_datamodule.PINNDataModule
+│
 ├── model
-│   └── _target_: src.models.pinn_module.PINNModule                             
-│       _partial_: true                                                         
-│       loss_fn: mse                                                            
-│       optimizer:                                                              
-│         _target_: torch.optim.Adam                                            
-│         _partial_: true                                                       
-│         lr: 0.001                                                             
-│         weight_decay: 0.0                                                     
-│         capturable: true                                                      
-│                                                                               
+│   └── _target_: src.models.pinn_module.PINNModule
+│       _partial_: true
+│       loss_fn: mse
+│       optimizer:
+│         _target_: torch.optim.Adam
+│         _partial_: true
+│         lr: 0.001
+│         weight_decay: 0.0
+│         capturable: true
+│
 ├── trainer
-│   └── _target_: lightning.pytorch.trainer.Trainer                             
+│   └── _target_: lightning.pytorch.trainer.Trainer
 │       default_root_dir: /home/reza/pinns-pytorch/examples/aneurysm3D/outputs/2
-│       min_epochs: 1                                                           
-│       max_epochs: 140                                                         
-│       accelerator: gpu                                                        
-│       devices:                                                                
-│       - 0                                                                     
-│       check_val_every_n_epoch: 1                                              
-│       deterministic: false                                                    
-│                                                                               
+│       min_epochs: 1
+│       max_epochs: 140
+│       accelerator: gpu
+│       devices:
+│       - 0
+│       check_val_every_n_epoch: 1
+│       deterministic: false
+│
 ├── paths
-│   └── root_dir: /home/reza/pinns-pytorch                                      
-│       data_dir: /home/reza/pinns-pytorch/data/                                
-│       rk_dir: /home/reza/pinns-pytorch/data/irk_weights                       
-│       log_dir: /home/reza/pinns-pytorch/logs/                                 
+│   └── root_dir: /home/reza/pinns-pytorch
+│       data_dir: /home/reza/pinns-pytorch/data/
+│       rk_dir: /home/reza/pinns-pytorch/data/irk_weights
+│       log_dir: /home/reza/pinns-pytorch/logs/
 │       output_dir: /home/reza/pinns-pytorch/examples/aneurysm3D/outputs/21-40-3
-│       work_dir: /home/reza/pinns-pytorch                                      
-│                                                                               
+│       work_dir: /home/reza/pinns-pytorch
+│
 ├── extras
-│   └── ignore_warnings: false                                                  
-│       enforce_tags: true                                                      
-│       print_config: true                                                      
-│                                                                               
+│   └── ignore_warnings: false
+│       enforce_tags: true
+│       print_config: true
+│
 ├── task_name
-│   └── aneurysm3D                                                              
+│   └── aneurysm3D
 ├── tags
-│   └── ['dev']                                                                 
+│   └── ['dev']
 ├── train
-│   └── True                                                                    
+│   └── True
 ├── test
-│   └── True                                                                    
+│   └── True
 ├── compile
-│   └── False                                                                   
+│   └── False
 ├── ckpt_path
-│   └── None                                                                    
+│   └── None
 ├── seed
-│   └── None                                                                    
+│   └── None
 ├── net
-│   └── _target_: src.models.net.neural_net.NetHFM                              
-│       _partial_: true                                                         
-│       layers:                                                                 
-│       - 4                                                                     
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 5                                                                     
-│       output_names:                                                           
-│       - c                                                                     
-│       - u                                                                     
-│       - v                                                                     
-│       - w                                                                     
-│       - p                                                                     
-│                                                                               
+│   └── _target_: src.models.net.neural_net.NetHFM
+│       _partial_: true
+│       layers:
+│       - 4
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 5
+│       output_names:
+│       - c
+│       - u
+│       - v
+│       - w
+│       - p
+│
 ├── batch_size
-│   └── 70000                                                                   
+│   └── 70000
 ├── mesh
-│   └── _target_: src.data.mesh.mesh.PointCloud                                 
-│       root_dir: /home/reza/pinns-pytorch/data/                                
-│       read_data_fn: ???                                                       
-│                                                                               
+│   └── _target_: src.data.mesh.mesh.PointCloud
+│       root_dir: /home/reza/pinns-pytorch/data/
+│       read_data_fn: ???
+│
 ├── train_datasets
 │   └── [{'mesh_sampler': {'_target_': 'src.data.sampler.mesh_sampler.MeshSample
 ├── val_dataset
@@ -92,12 +92,12 @@ CONFIG
 ├── test_dataset
 │   └── [{'mesh_sampler': {'_target_': 'src.data.sampler.mesh_sampler.MeshSample
 └── optimized_metric
-    └── error:                                                                  
-        - c                                                                     
-        - u                                                                     
-        - v                                                                     
-        - w                                                                     
-                                                                                
+    └── error:
+        - c
+        - u
+        - v
+        - w
+
 [[36m2023-08-22 21:40:38,339[0m][[34m__main__[0m][[32mINFO[0m] - Instantiating mesh <src.data.mesh.mesh.PointCloud>[0m
 [[36m2023-08-22 21:40:38,341[0m][[34msrc.utils.utils[0m][[32mINFO[0m] - Data is available.[0m
 [[36m2023-08-22 21:40:45,252[0m][[34m__main__[0m][[32mINFO[0m] - Instantiating training dataset number 1: <src.data.sampler.mesh_sampler.MeshSampler>[0m
@@ -120,13 +120,13 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [3]
 
   | Name          | Type       | Params
 ---------------------------------------------
-0 | net           | NetHFM     | 569 K 
-1 | train_loss    | MeanMetric | 0     
-2 | val_loss      | MeanMetric | 0     
-3 | val_error     | MeanMetric | 0     
-4 | test_loss     | MeanMetric | 0     
-5 | test_error    | MeanMetric | 0     
-6 | val_loss_best | MinMetric  | 0     
+0 | net           | NetHFM     | 569 K
+1 | train_loss    | MeanMetric | 0
+2 | val_loss      | MeanMetric | 0
+3 | val_error     | MeanMetric | 0
+4 | test_loss     | MeanMetric | 0
+5 | test_error    | MeanMetric | 0
+6 | val_loss_best | MinMetric  | 0
 ---------------------------------------------
 569 K     Trainable params
 0         Non-trainable params
@@ -136,128 +136,128 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [3]
 [[36m2023-08-22 21:42:16,850[0m][[34msrc.utils.utils[0m][[32mINFO[0m] - Printing config tree with Rich! <cfg.extras.print_config=True>[0m
 CONFIG
 ├── data
-│   └── _target_: src.data.pinn_datamodule.PINNDataModule                       
-│                                                                               
+│   └── _target_: src.data.pinn_datamodule.PINNDataModule
+│
 ├── model
-│   └── _target_: src.models.pinn_module.PINNModule                             
-│       _partial_: true                                                         
-│       loss_fn: mse                                                            
-│       optimizer:                                                              
-│         _target_: torch.optim.Adam                                            
-│         _partial_: true                                                       
-│         lr: 0.001                                                             
-│         weight_decay: 0.0                                                     
-│         capturable: true                                                      
-│                                                                               
+│   └── _target_: src.models.pinn_module.PINNModule
+│       _partial_: true
+│       loss_fn: mse
+│       optimizer:
+│         _target_: torch.optim.Adam
+│         _partial_: true
+│         lr: 0.001
+│         weight_decay: 0.0
+│         capturable: true
+│
 ├── callbacks
-│   └── model_checkpoint:                                                       
-│         _target_: lightning.pytorch.callbacks.ModelCheckpoint                 
+│   └── model_checkpoint:
+│         _target_: lightning.pytorch.callbacks.ModelCheckpoint
 │         dirpath: /home/reza/pinns-pytorch/examples/aneurysm3D/outputs/21-42-16
-│         filename: epoch_{epoch:03d}                                           
-│         monitor: val/loss                                                     
-│         verbose: false                                                        
-│         save_last: true                                                       
-│         save_top_k: 1                                                         
-│         mode: min                                                             
-│         auto_insert_metric_name: false                                        
-│         save_weights_only: false                                              
-│         every_n_train_steps: null                                             
-│         train_time_interval: null                                             
-│         every_n_epochs: null                                                  
-│         save_on_train_epoch_end: null                                         
-│       early_stopping:                                                         
-│         _target_: lightning.pytorch.callbacks.EarlyStopping                   
-│         monitor: val/loss                                                     
-│         min_delta: 0.0                                                        
-│         patience: 100                                                         
-│         verbose: false                                                        
-│         mode: min                                                             
-│         strict: true                                                          
-│         check_finite: true                                                    
-│         stopping_threshold: null                                              
-│         divergence_threshold: null                                            
-│         check_on_train_epoch_end: null                                        
-│       model_summary:                                                          
-│         _target_: lightning.pytorch.callbacks.RichModelSummary                
-│         max_depth: -1                                                         
-│       rich_progress_bar:                                                      
-│         _target_: lightning.pytorch.callbacks.RichProgressBar                 
-│                                                                               
+│         filename: epoch_{epoch:03d}
+│         monitor: val/loss
+│         verbose: false
+│         save_last: true
+│         save_top_k: 1
+│         mode: min
+│         auto_insert_metric_name: false
+│         save_weights_only: false
+│         every_n_train_steps: null
+│         train_time_interval: null
+│         every_n_epochs: null
+│         save_on_train_epoch_end: null
+│       early_stopping:
+│         _target_: lightning.pytorch.callbacks.EarlyStopping
+│         monitor: val/loss
+│         min_delta: 0.0
+│         patience: 100
+│         verbose: false
+│         mode: min
+│         strict: true
+│         check_finite: true
+│         stopping_threshold: null
+│         divergence_threshold: null
+│         check_on_train_epoch_end: null
+│       model_summary:
+│         _target_: lightning.pytorch.callbacks.RichModelSummary
+│         max_depth: -1
+│       rich_progress_bar:
+│         _target_: lightning.pytorch.callbacks.RichProgressBar
+│
 ├── logger
-│   └── csv:                                                                    
-│         _target_: lightning.pytorch.loggers.csv_logs.CSVLogger                
+│   └── csv:
+│         _target_: lightning.pytorch.loggers.csv_logs.CSVLogger
 │         save_dir: /home/reza/pinns-pytorch/examples/aneurysm3D/outputs/21-42-1
-│         name: csv/                                                            
-│         prefix: ''                                                            
-│                                                                               
+│         name: csv/
+│         prefix: ''
+│
 ├── trainer
-│   └── _target_: lightning.pytorch.trainer.Trainer                             
+│   └── _target_: lightning.pytorch.trainer.Trainer
 │       default_root_dir: /home/reza/pinns-pytorch/examples/aneurysm3D/outputs/2
-│       min_epochs: 1                                                           
-│       max_epochs: 140                                                         
-│       accelerator: gpu                                                        
-│       devices:                                                                
-│       - 0                                                                     
-│       check_val_every_n_epoch: 1                                              
-│       deterministic: false                                                    
-│                                                                               
+│       min_epochs: 1
+│       max_epochs: 140
+│       accelerator: gpu
+│       devices:
+│       - 0
+│       check_val_every_n_epoch: 1
+│       deterministic: false
+│
 ├── paths
-│   └── root_dir: /home/reza/pinns-pytorch                                      
-│       data_dir: /home/reza/pinns-pytorch/data/                                
-│       rk_dir: /home/reza/pinns-pytorch/data/irk_weights                       
-│       log_dir: /home/reza/pinns-pytorch/logs/                                 
+│   └── root_dir: /home/reza/pinns-pytorch
+│       data_dir: /home/reza/pinns-pytorch/data/
+│       rk_dir: /home/reza/pinns-pytorch/data/irk_weights
+│       log_dir: /home/reza/pinns-pytorch/logs/
 │       output_dir: /home/reza/pinns-pytorch/examples/aneurysm3D/outputs/21-42-1
-│       work_dir: /home/reza/pinns-pytorch                                      
-│                                                                               
+│       work_dir: /home/reza/pinns-pytorch
+│
 ├── extras
-│   └── ignore_warnings: false                                                  
-│       enforce_tags: true                                                      
-│       print_config: true                                                      
-│                                                                               
+│   └── ignore_warnings: false
+│       enforce_tags: true
+│       print_config: true
+│
 ├── task_name
-│   └── aneurysm3D                                                              
+│   └── aneurysm3D
 ├── tags
-│   └── ['dev']                                                                 
+│   └── ['dev']
 ├── train
-│   └── True                                                                    
+│   └── True
 ├── test
-│   └── True                                                                    
+│   └── True
 ├── compile
-│   └── False                                                                   
+│   └── False
 ├── ckpt_path
-│   └── None                                                                    
+│   └── None
 ├── seed
-│   └── None                                                                    
+│   └── None
 ├── net
-│   └── _target_: src.models.net.neural_net.NetHFM                              
-│       _partial_: true                                                         
-│       layers:                                                                 
-│       - 4                                                                     
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 5                                                                     
-│       output_names:                                                           
-│       - c                                                                     
-│       - u                                                                     
-│       - v                                                                     
-│       - w                                                                     
-│       - p                                                                     
-│                                                                               
+│   └── _target_: src.models.net.neural_net.NetHFM
+│       _partial_: true
+│       layers:
+│       - 4
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 5
+│       output_names:
+│       - c
+│       - u
+│       - v
+│       - w
+│       - p
+│
 ├── batch_size
-│   └── 70000                                                                   
+│   └── 70000
 ├── mesh
-│   └── _target_: src.data.mesh.mesh.PointCloud                                 
-│       root_dir: /home/reza/pinns-pytorch/data/                                
-│       read_data_fn: ???                                                       
-│                                                                               
+│   └── _target_: src.data.mesh.mesh.PointCloud
+│       root_dir: /home/reza/pinns-pytorch/data/
+│       read_data_fn: ???
+│
 ├── train_datasets
 │   └── [{'mesh_sampler': {'_target_': 'src.data.sampler.mesh_sampler.MeshSample
 ├── val_dataset
@@ -265,12 +265,12 @@ CONFIG
 ├── test_dataset
 │   └── [{'mesh_sampler': {'_target_': 'src.data.sampler.mesh_sampler.MeshSample
 └── optimized_metric
-    └── error:                                                                  
-        - c                                                                     
-        - u                                                                     
-        - v                                                                     
-        - w                                                                     
-                                                                                
+    └── error:
+        - c
+        - u
+        - v
+        - w
+
 [[36m2023-08-22 21:42:16,891[0m][[34m__main__[0m][[32mINFO[0m] - Instantiating mesh <src.data.mesh.mesh.PointCloud>[0m
 [[36m2023-08-22 21:42:16,893[0m][[34msrc.utils.utils[0m][[32mINFO[0m] - Data is available.[0m
 [[36m2023-08-22 21:42:23,803[0m][[34m__main__[0m][[32mINFO[0m] - Instantiating training dataset number 1: <src.data.sampler.mesh_sampler.MeshSampler>[0m
@@ -310,136 +310,136 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [3]
 │ 9  │ test_error    │ MeanMetric    │      0 │
 │ 10 │ val_loss_best │ MinMetric     │      0 │
 └────┴───────────────┴───────────────┴────────┘
-Trainable params: 569 K                                                         
-Non-trainable params: 0                                                         
-Total params: 569 K                                                             
-Total estimated model params size (MB): 2                                       
+Trainable params: 569 K
+Non-trainable params: 0
+Total params: 569 K
+Total estimated model params size (MB): 2
 [[36m2023-08-22 21:52:16,176[0m][[34msrc.utils.utils[0m][[32mINFO[0m] - Enforcing tags! <cfg.extras.enforce_tags=True>[0m
 [[36m2023-08-22 21:52:16,179[0m][[34msrc.utils.utils[0m][[32mINFO[0m] - Printing config tree with Rich! <cfg.extras.print_config=True>[0m
 CONFIG
 ├── data
-│   └── _target_: src.data.pinn_datamodule.PINNDataModule                       
-│                                                                               
+│   └── _target_: src.data.pinn_datamodule.PINNDataModule
+│
 ├── model
-│   └── _target_: src.models.pinn_module.PINNModule                             
-│       _partial_: true                                                         
-│       loss_fn: mse                                                            
-│       optimizer:                                                              
-│         _target_: torch.optim.Adam                                            
-│         _partial_: true                                                       
-│         lr: 0.001                                                             
-│         weight_decay: 0.0                                                     
-│         capturable: true                                                      
-│                                                                               
+│   └── _target_: src.models.pinn_module.PINNModule
+│       _partial_: true
+│       loss_fn: mse
+│       optimizer:
+│         _target_: torch.optim.Adam
+│         _partial_: true
+│         lr: 0.001
+│         weight_decay: 0.0
+│         capturable: true
+│
 ├── callbacks
-│   └── model_checkpoint:                                                       
-│         _target_: lightning.pytorch.callbacks.ModelCheckpoint                 
+│   └── model_checkpoint:
+│         _target_: lightning.pytorch.callbacks.ModelCheckpoint
 │         dirpath: /home/reza/pinns-pytorch/examples/aneurysm3D/outputs/21-52-16
-│         filename: epoch_{epoch:03d}                                           
-│         monitor: val/loss                                                     
-│         verbose: false                                                        
-│         save_last: true                                                       
-│         save_top_k: 1                                                         
-│         mode: min                                                             
-│         auto_insert_metric_name: false                                        
-│         save_weights_only: false                                              
-│         every_n_train_steps: null                                             
-│         train_time_interval: null                                             
-│         every_n_epochs: null                                                  
-│         save_on_train_epoch_end: null                                         
-│       early_stopping:                                                         
-│         _target_: lightning.pytorch.callbacks.EarlyStopping                   
-│         monitor: val/loss                                                     
-│         min_delta: 0.0                                                        
-│         patience: 100                                                         
-│         verbose: false                                                        
-│         mode: min                                                             
-│         strict: true                                                          
-│         check_finite: true                                                    
-│         stopping_threshold: null                                              
-│         divergence_threshold: null                                            
-│         check_on_train_epoch_end: null                                        
-│       model_summary:                                                          
-│         _target_: lightning.pytorch.callbacks.RichModelSummary                
-│         max_depth: -1                                                         
-│       rich_progress_bar:                                                      
-│         _target_: lightning.pytorch.callbacks.RichProgressBar                 
-│                                                                               
+│         filename: epoch_{epoch:03d}
+│         monitor: val/loss
+│         verbose: false
+│         save_last: true
+│         save_top_k: 1
+│         mode: min
+│         auto_insert_metric_name: false
+│         save_weights_only: false
+│         every_n_train_steps: null
+│         train_time_interval: null
+│         every_n_epochs: null
+│         save_on_train_epoch_end: null
+│       early_stopping:
+│         _target_: lightning.pytorch.callbacks.EarlyStopping
+│         monitor: val/loss
+│         min_delta: 0.0
+│         patience: 100
+│         verbose: false
+│         mode: min
+│         strict: true
+│         check_finite: true
+│         stopping_threshold: null
+│         divergence_threshold: null
+│         check_on_train_epoch_end: null
+│       model_summary:
+│         _target_: lightning.pytorch.callbacks.RichModelSummary
+│         max_depth: -1
+│       rich_progress_bar:
+│         _target_: lightning.pytorch.callbacks.RichProgressBar
+│
 ├── logger
-│   └── csv:                                                                    
-│         _target_: lightning.pytorch.loggers.csv_logs.CSVLogger                
+│   └── csv:
+│         _target_: lightning.pytorch.loggers.csv_logs.CSVLogger
 │         save_dir: /home/reza/pinns-pytorch/examples/aneurysm3D/outputs/21-52-1
-│         name: csv/                                                            
-│         prefix: ''                                                            
-│                                                                               
+│         name: csv/
+│         prefix: ''
+│
 ├── trainer
-│   └── _target_: lightning.pytorch.trainer.Trainer                             
+│   └── _target_: lightning.pytorch.trainer.Trainer
 │       default_root_dir: /home/reza/pinns-pytorch/examples/aneurysm3D/outputs/2
-│       min_epochs: 1                                                           
-│       max_epochs: 140                                                         
-│       accelerator: gpu                                                        
-│       devices:                                                                
-│       - 0                                                                     
-│       check_val_every_n_epoch: 1                                              
-│       deterministic: false                                                    
-│                                                                               
+│       min_epochs: 1
+│       max_epochs: 140
+│       accelerator: gpu
+│       devices:
+│       - 0
+│       check_val_every_n_epoch: 1
+│       deterministic: false
+│
 ├── paths
-│   └── root_dir: /home/reza/pinns-pytorch                                      
-│       data_dir: /home/reza/pinns-pytorch/data/                                
-│       rk_dir: /home/reza/pinns-pytorch/data/irk_weights                       
-│       log_dir: /home/reza/pinns-pytorch/logs/                                 
+│   └── root_dir: /home/reza/pinns-pytorch
+│       data_dir: /home/reza/pinns-pytorch/data/
+│       rk_dir: /home/reza/pinns-pytorch/data/irk_weights
+│       log_dir: /home/reza/pinns-pytorch/logs/
 │       output_dir: /home/reza/pinns-pytorch/examples/aneurysm3D/outputs/21-52-1
-│       work_dir: /home/reza/pinns-pytorch                                      
-│                                                                               
+│       work_dir: /home/reza/pinns-pytorch
+│
 ├── extras
-│   └── ignore_warnings: false                                                  
-│       enforce_tags: true                                                      
-│       print_config: true                                                      
-│                                                                               
+│   └── ignore_warnings: false
+│       enforce_tags: true
+│       print_config: true
+│
 ├── task_name
-│   └── aneurysm3D                                                              
+│   └── aneurysm3D
 ├── tags
-│   └── ['dev']                                                                 
+│   └── ['dev']
 ├── train
-│   └── True                                                                    
+│   └── True
 ├── test
-│   └── True                                                                    
+│   └── True
 ├── compile
-│   └── False                                                                   
+│   └── False
 ├── ckpt_path
-│   └── None                                                                    
+│   └── None
 ├── seed
-│   └── None                                                                    
+│   └── None
 ├── net
-│   └── _target_: src.models.net.neural_net.NetHFM                              
-│       _partial_: true                                                         
-│       layers:                                                                 
-│       - 4                                                                     
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 250                                                                   
-│       - 5                                                                     
-│       output_names:                                                           
-│       - c                                                                     
-│       - u                                                                     
-│       - v                                                                     
-│       - w                                                                     
-│       - p                                                                     
-│                                                                               
+│   └── _target_: src.models.net.neural_net.NetHFM
+│       _partial_: true
+│       layers:
+│       - 4
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 250
+│       - 5
+│       output_names:
+│       - c
+│       - u
+│       - v
+│       - w
+│       - p
+│
 ├── batch_size
-│   └── 70000                                                                   
+│   └── 70000
 ├── mesh
-│   └── _target_: src.data.mesh.mesh.PointCloud                                 
-│       root_dir: /home/reza/pinns-pytorch/data/                                
-│       read_data_fn: ???                                                       
-│                                                                               
+│   └── _target_: src.data.mesh.mesh.PointCloud
+│       root_dir: /home/reza/pinns-pytorch/data/
+│       read_data_fn: ???
+│
 ├── train_datasets
 │   └── [{'mesh_sampler': {'_target_': 'src.data.sampler.mesh_sampler.MeshSample
 ├── val_dataset
@@ -447,12 +447,12 @@ CONFIG
 ├── test_dataset
 │   └── [{'mesh_sampler': {'_target_': 'src.data.sampler.mesh_sampler.MeshSample
 └── optimized_metric
-    └── error:                                                                  
-        - c                                                                     
-        - u                                                                     
-        - v                                                                     
-        - w                                                                     
-                                                                                
+    └── error:
+        - c
+        - u
+        - v
+        - w
+
 [[36m2023-08-22 21:52:16,221[0m][[34m__main__[0m][[32mINFO[0m] - Instantiating mesh <src.data.mesh.mesh.PointCloud>[0m
 [[36m2023-08-22 21:52:16,223[0m][[34msrc.utils.utils[0m][[32mINFO[0m] - Data is available.[0m
 [[36m2023-08-22 21:52:23,126[0m][[34m__main__[0m][[32mINFO[0m] - Instantiating training dataset number 1: <src.data.sampler.mesh_sampler.MeshSampler>[0m
@@ -492,24 +492,24 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [3]
 │ 9  │ test_error    │ MeanMetric    │      0 │
 │ 10 │ val_loss_best │ MinMetric     │      0 │
 └────┴───────────────┴───────────────┴────────┘
-Trainable params: 569 K                                                         
-Non-trainable params: 0                                                         
-Total params: 569 K                                                             
-Total estimated model params size (MB): 2                                       
+Trainable params: 569 K
+Non-trainable params: 0
+Total params: 569 K
+Total estimated model params size (MB): 2
 `Trainer.fit` stopped: `max_epochs=140` reached.
-Epoch 139/139 ━━━━━━━━━━━━━━━ 424/424 0:11:03 •       0.64it/s v_num: 0         
+Epoch 139/139 ━━━━━━━━━━━━━━━ 424/424 0:11:03 •       0.64it/s v_num: 0
                                       0:00:00                  val/loss: 712.933
-                                                               val/error_c:     
-                                                               0.053            
-                                                               val/error_u:     
-                                                               0.563            
+                                                               val/error_c:
+                                                               0.053
+                                                               val/error_u:
+                                                               0.563
                                                                val/error_v: 0.53
                                                                val/error_w: 0.56
-                                                               val/error_p:     
-                                                               0.999            
-                                                               val/loss_best:   
-                                                               712.931          
-                                                               train/loss: 0.0  
+                                                               val/error_p:
+                                                               0.999
+                                                               val/loss_best:
+                                                               712.931
+                                                               train/loss: 0.0
 [[36m2023-08-23 23:58:10,281[0m][[34m__main__[0m][[32mINFO[0m] - Starting testing![0m
 [[36m2023-08-23 23:58:10,281[0m][[34m__main__[0m][[33mWARNING[0m] - Best ckpt not found! Using current weights for testing...[0m
 Trainer already configured with model summary callbacks: [<class 'lightning.pytorch.callbacks.rich_model_summary.RichModelSummary'>]. Skipping setting a default `ModelSummary` callback.
@@ -528,10 +528,185 @@ LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [3]
 │       test/error_w        │    0.5530816316604614     │
 │         test/loss         │      768.33447265625      │
 └───────────────────────────┴───────────────────────────┘
-Testing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2/2 0:00:00 • 0:00:00 87.94it/s 
+Testing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2/2 0:00:00 • 0:00:00 87.94it/s
 [[36m2023-08-23 23:58:10,368[0m][[34m__main__[0m][[32mINFO[0m] - Best ckpt path: None[0m
 [[36m2023-08-23 23:58:10,369[0m][[34msrc.utils.utils[0m][[32mINFO[0m] - Output dir: /home/reza/pinns-pytorch/examples/aneurysm3D/outputs/21-52-16[0m
 [[36m2023-08-23 23:58:10,369[0m][[34msrc.utils.utils[0m][[32mINFO[0m] - Retrieved metric value! <val/error_c=0.052602510899305344>[0m
 [[36m2023-08-23 23:58:10,369[0m][[34msrc.utils.utils[0m][[32mINFO[0m] - Retrieved metric value! <val/error_u=0.5627376437187195>[0m
 [[36m2023-08-23 23:58:10,369[0m][[34msrc.utils.utils[0m][[32mINFO[0m] - Retrieved metric value! <val/error_v=0.5300697088241577>[0m
 [[36m2023-08-23 23:58:10,369[0m][[34msrc.utils.utils[0m][[32mINFO[0m] - Retrieved metric value! <val/error_w=0.5598423480987549>[0m
+[2023-08-25 04:27:46,827][pinnstorch.utils.utils][INFO] - Enforcing tags! <cfg.extras.enforce_tags=True>
+[2023-08-25 04:27:46,830][pinnstorch.utils.utils][INFO] - Printing config tree with Rich! <cfg.extras.print_config=True>
+CONFIG
+├── data
+│   └── _target_: pinnstorch.data.PINNDataModule                                
+│                                                                               
+├── model
+│   └── _target_: pinnstorch.models.PINNModule                                  
+│       _partial_: true                                                         
+│       loss_fn: mse                                                            
+│       automatic_optimization: false                                           
+│       optimizer:                                                              
+│         _target_: torch.optim.Adam                                            
+│         _partial_: true                                                       
+│         lr: 0.001                                                             
+│         weight_decay: 0.0                                                     
+│         capturable: true                                                      
+│                                                                               
+├── callbacks
+│   └── model_checkpoint:                                                       
+│         _target_: lightning.pytorch.callbacks.ModelCheckpoint                 
+│         dirpath: /home/reza/tmp/pinns-torch/examples/aneurysm3D/outputs/04-27-
+│         filename: epoch_{epoch:03d}_{val/loss}                                
+│         monitor: val/loss                                                     
+│         verbose: null                                                         
+│         save_last: true                                                       
+│         save_top_k: 1                                                         
+│         mode: min                                                             
+│         auto_insert_metric_name: false                                        
+│         save_weights_only: false                                              
+│         every_n_train_steps: null                                             
+│         train_time_interval: null                                             
+│         every_n_epochs: null                                                  
+│         save_on_train_epoch_end: null                                         
+│       model_summary:                                                          
+│         _target_: lightning.pytorch.callbacks.RichModelSummary                
+│         max_depth: -1                                                         
+│       rich_progress_bar:                                                      
+│         _target_: lightning.pytorch.callbacks.RichProgressBar                 
+│                                                                               
+├── logger
+│   └── csv:                                                                    
+│         _target_: lightning.pytorch.loggers.csv_logs.CSVLogger                
+│         save_dir: /home/reza/tmp/pinns-torch/examples/aneurysm3D/outputs/04-27
+│         name: csv/                                                            
+│         prefix: ''                                                            
+│                                                                               
+├── trainer
+│   └── _target_: lightning.pytorch.trainer.Trainer                             
+│       default_root_dir: /home/reza/tmp/pinns-torch/examples/aneurysm3D/outputs
+│       min_epochs: 1                                                           
+│       max_epochs: 200                                                         
+│       accelerator: gpu                                                        
+│       devices:                                                                
+│       - 0                                                                     
+│       check_val_every_n_epoch: 1                                              
+│       inference_mode: false                                                   
+│       log_every_n_steps: 1                                                    
+│       deterministic: false                                                    
+│                                                                               
+├── paths
+│   └── root_dir: /home/reza/tmp/pinns-torch                                    
+│       data_dir: /home/reza/tmp/pinns-torch/data/                              
+│       rk_dir: /home/reza/tmp/pinns-torch/data/irk_weights                     
+│       log_dir: /home/reza/tmp/pinns-torch/logs/                               
+│       output_dir: /home/reza/tmp/pinns-torch/examples/aneurysm3D/outputs/04-27
+│       work_dir: /home/reza/tmp/pinns-torch                                    
+│                                                                               
+├── extras
+│   └── ignore_warnings: false                                                  
+│       enforce_tags: true                                                      
+│       print_config: true                                                      
+│                                                                               
+├── task_name
+│   └── aneurysm3D                                                              
+├── tags
+│   └── ['dev']                                                                 
+├── train
+│   └── True                                                                    
+├── test
+│   └── True                                                                    
+├── compile
+│   └── True                                                                    
+├── ckpt_path
+│   └── None                                                                    
+├── seed
+│   └── None                                                                    
+├── net
+│   └── _target_: pinnstorch.models.NetHFM                                      
+│       _partial_: true                                                         
+│       layers:                                                                 
+│       - 4                                                                     
+│       - 250                                                                   
+│       - 250                                                                   
+│       - 250                                                                   
+│       - 250                                                                   
+│       - 250                                                                   
+│       - 250                                                                   
+│       - 250                                                                   
+│       - 250                                                                   
+│       - 250                                                                   
+│       - 250                                                                   
+│       - 5                                                                     
+│       output_names:                                                           
+│       - c                                                                     
+│       - u                                                                     
+│       - v                                                                     
+│       - w                                                                     
+│       - p                                                                     
+│                                                                               
+├── batch_size
+│   └── 70000                                                                   
+├── mesh
+│   └── _target_: pinnstorch.data.PointCloud                                    
+│       root_dir: /home/reza/tmp/pinns-torch/data/                              
+│       read_data_fn: ???                                                       
+│                                                                               
+├── train_datasets
+│   └── [{'mesh_sampler': {'_target_': 'pinnstorch.data.MeshSampler', '_partial_
+├── val_dataset
+│   └── [{'mesh_sampler': {'_target_': 'pinnstorch.data.MeshSampler', '_partial_
+├── test_dataset
+│   └── [{'mesh_sampler': {'_target_': 'pinnstorch.data.MeshSampler', '_partial_
+└── optimized_metric
+    └── error:                                                                  
+        - c                                                                     
+        - u                                                                     
+        - v                                                                     
+        - w                                                                     
+                                                                                
+[2023-08-25 04:27:46,871][pinnstorch.train][INFO] - Model will be compiled. Setting optimizer capturable attribute to True.
+[2023-08-25 04:27:46,871][pinnstorch.train][INFO] - Model will be compiled. Disabling automatic optimization.
+[2023-08-25 04:27:46,872][pinnstorch.train][INFO] - Instantiating mesh <pinnstorch.data.PointCloud>
+[2023-08-25 04:27:46,876][pinnstorch.utils.utils][INFO] - Data is available.
+[2023-08-25 04:27:53,932][pinnstorch.train][INFO] - Instantiating training dataset number 1: <pinnstorch.data.MeshSampler>
+[2023-08-25 04:27:55,054][pinnstorch.train][INFO] - Instantiating training dataset number 2: <pinnstorch.data.MeshSampler>
+[2023-08-25 04:27:55,955][pinnstorch.train][INFO] - Instantiating validation dataset number 1: <pinnstorch.data.MeshSampler>
+[2023-08-25 04:27:58,294][pinnstorch.train][INFO] - Instantiating test dataset number 1: <pinnstorch.data.MeshSampler>
+[2023-08-25 04:27:58,303][pinnstorch.train][INFO] - Instantiating datamodule <pinnstorch.data.PINNDataModule>
+[2023-08-25 04:27:58,399][pinnstorch.train][INFO] - Instantiating neural net <pinnstorch.models.NetHFM>
+[2023-08-25 04:28:00,065][pinnstorch.train][INFO] - Instantiating model <pinnstorch.models.PINNModule>
+[2023-08-25 04:28:00,068][pinnstorch.train][INFO] - Instantiating callbacks...
+[2023-08-25 04:28:00,068][pinnstorch.utils.instantiators][INFO] - Instantiating callback <lightning.pytorch.callbacks.ModelCheckpoint>
+[2023-08-25 04:28:00,070][pinnstorch.utils.instantiators][INFO] - Instantiating callback <lightning.pytorch.callbacks.RichModelSummary>
+[2023-08-25 04:28:00,071][pinnstorch.utils.instantiators][INFO] - Instantiating callback <lightning.pytorch.callbacks.RichProgressBar>
+[2023-08-25 04:28:00,071][pinnstorch.train][INFO] - Instantiating loggers...
+[2023-08-25 04:28:00,071][pinnstorch.utils.instantiators][INFO] - Instantiating logger <lightning.pytorch.loggers.csv_logs.CSVLogger>
+[2023-08-25 04:28:00,073][pinnstorch.train][INFO] - Instantiating trainer <lightning.pytorch.trainer.Trainer>
+Trainer already configured with model summary callbacks: [<class 'lightning.pytorch.callbacks.rich_model_summary.RichModelSummary'>]. Skipping setting a default `ModelSummary` callback.
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+[2023-08-25 04:28:00,151][pinnstorch.train][INFO] - Logging hyperparameters!
+[2023-08-25 04:28:00,153][pinnstorch.train][INFO] - Starting training!
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [1]
+┏━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━┓
+┃    ┃ Name          ┃ Type          ┃ Params ┃
+┡━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━┩
+│ 0  │ net           │ NetHFM        │  569 K │
+│ 1  │ net.weights   │ ParameterList │  564 K │
+│ 2  │ net.biases    │ ParameterList │  2.5 K │
+│ 3  │ net.gammas    │ ParameterList │  2.5 K │
+│ 4  │ net.sigmoid   │ Sigmoid       │      0 │
+│ 5  │ train_loss    │ MeanMetric    │      0 │
+│ 6  │ val_loss      │ MeanMetric    │      0 │
+│ 7  │ val_error     │ MeanMetric    │      0 │
+│ 8  │ test_loss     │ MeanMetric    │      0 │
+│ 9  │ test_error    │ MeanMetric    │      0 │
+│ 10 │ val_loss_best │ MinMetric     │      0 │
+└────┴───────────────┴───────────────┴────────┘
+Trainable params: 569 K                                                         
+Non-trainable params: 0                                                         
+Total params: 569 K                                                             
+Total estimated model params size (MB): 2                                       

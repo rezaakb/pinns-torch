@@ -21,7 +21,7 @@ trainer:
   max_epochs: 10000
   accelerator: gpu
   devices:
-  - 0
+    - 0
   check_val_every_n_epoch: 1000
   log_every_n_steps: 1
   deterministic: false
@@ -52,6 +52,6 @@ extras:
   print_config: true
 task_name: burgers_discrete_forward
 tags:
-- dev
+  - dev
 ckpt_path: null
 seed: 1234

@@ -1,56 +1,55 @@
 from typing import Any, Dict, List, Optional, Tuple
 
 import hydra
+import numpy as np
 import rootutils
 import torch
+
 import pinnstorch
-import numpy as np
 
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
 from omegaconf import DictConfig
 
 
-
 def read_data_fn(root_path):
-    data = pinnstorch.utils.load_data(root_path, 'Aneurysm3D.mat')
-        
-    t_star = data['t_star'] # T x 1
-    x_star = data['x_star'] # N x 1
-    y_star = data['y_star'] # N x 1
-    z_star = data['z_star'] # N x 1
-    
-    U_star = data['U_star'] # N x T
-    V_star = data['V_star'] # N x T
-    W_star = data['W_star'] # N x T
-    P_star = data['P_star'] # N x T
-    C_star = data['C_star'] # N x T   
-    
-    return pinnstorch.data.PointCloudData(spatial = [x_star, y_star, z_star],
-                                          time = [t_star], 
-                                          solution = {'u': U_star, 'v':V_star, 'w': W_star,
-                                                      'p': P_star, 'c':C_star})
+    data = pinnstorch.utils.load_data(root_path, "Aneurysm3D.mat")
 
+    t_star = data["t_star"]  # T x 1
+    x_star = data["x_star"]  # N x 1
+    y_star = data["y_star"]  # N x 1
+    z_star = data["z_star"]  # N x 1
+
+    U_star = data["U_star"]  # N x T
+    V_star = data["V_star"]  # N x T
+    W_star = data["W_star"]  # N x T
+    P_star = data["P_star"]  # N x T
+    C_star = data["C_star"]  # N x T
+
+    return pinnstorch.data.PointCloudData(
+        spatial=[x_star, y_star, z_star],
+        time=[t_star],
+        solution={"u": U_star, "v": V_star, "w": W_star, "p": P_star, "c": C_star},
+    )
 
 
 def pde_fn(outputs, x, y, z, t, extra_variables=None):
-    
-    Pec = 1.0/0.0101822
-    Rey = 1.0/0.0101822
-    
-    Y = torch.cat([outputs['c'], outputs['u'], outputs['v'], outputs['w'], outputs['p']], 1)
-    
+    Pec = 1.0 / 0.0101822
+    Rey = 1.0 / 0.0101822
+
+    Y = torch.cat([outputs["c"], outputs["u"], outputs["v"], outputs["w"], outputs["p"]], 1)
+
     Y_t = pinnstorch.utils.fwd_gradient(Y, t)
     Y_x = pinnstorch.utils.fwd_gradient(Y, x)
     Y_y = pinnstorch.utils.fwd_gradient(Y, y)
     Y_z = pinnstorch.utils.fwd_gradient(Y, z)
-    
+
     Y_xx = pinnstorch.utils.fwd_gradient(Y_x, x)
     Y_yy = pinnstorch.utils.fwd_gradient(Y_y, y)
     Y_zz = pinnstorch.utils.fwd_gradient(Y_z, z)
 
     c, u, v, w, p = torch.split(Y, (1), dim=1)
-    
+
     c_t, u_t, v_t, w_t, _ = torch.split(Y_t, (1), dim=1)
     c_x, u_x, v_x, w_x, p_x = torch.split(Y_x, (1), dim=1)
     c_y, u_y, v_y, w_y, p_y = torch.split(Y_y, (1), dim=1)
@@ -59,12 +58,12 @@ def pde_fn(outputs, x, y, z, t, extra_variables=None):
     c_xx, u_xx, v_xx, w_xx, _ = torch.split(Y_xx, (1), dim=1)
     c_yy, u_yy, v_yy, w_yy, _ = torch.split(Y_yy, (1), dim=1)
     c_zz, u_zz, v_zz, w_zz, _ = torch.split(Y_zz, (1), dim=1)
-    
-    outputs['e1'] = c_t + (u*c_x + v*c_y + w*c_z) - (1.0/Pec)*(c_xx + c_yy + c_zz)
-    outputs['e2'] = u_t + (u*u_x + v*u_y + w*u_z) + p_x - (1.0/Rey)*(u_xx + u_yy + u_zz)
-    outputs['e3'] = v_t + (u*v_x + v*v_y + w*v_z) + p_y - (1.0/Rey)*(v_xx + v_yy + v_zz)
-    outputs['e4'] = w_t + (u*w_x + v*w_y + w*w_z) + p_z - (1.0/Rey)*(w_xx + w_yy + w_zz)
-    outputs['e5'] = u_x + v_y + w_z
+
+    outputs["e1"] = c_t + (u * c_x + v * c_y + w * c_z) - (1.0 / Pec) * (c_xx + c_yy + c_zz)
+    outputs["e2"] = u_t + (u * u_x + v * u_y + w * u_z) + p_x - (1.0 / Rey) * (u_xx + u_yy + u_zz)
+    outputs["e3"] = v_t + (u * v_x + v * v_y + w * v_z) + p_y - (1.0 / Rey) * (v_xx + v_yy + v_zz)
+    outputs["e4"] = w_t + (u * w_x + v * w_y + w * w_z) + p_z - (1.0 / Rey) * (w_xx + w_yy + w_zz)
+    outputs["e5"] = u_x + v_y + w_z
 
     return outputs
 
@@ -76,16 +75,15 @@ def main(cfg: DictConfig) -> Optional[float]:
     :param cfg: DictConfig configuration composed by Hydra.
     :return: Optional[float] with optimized metric value.
     """
-    
+
     # apply extra utilities
     # (e.g. ask for tags if none are provided in cfg, print cfg tree, etc.)
     pinnstorch.utils.extras(cfg)
 
     # train the model
-    metric_dict, _ = pinnstorch.train(cfg,
-                                      read_data_fn = read_data_fn,
-                                      pde_fn = pde_fn,
-                                      output_fn = None)
+    metric_dict, _ = pinnstorch.train(
+        cfg, read_data_fn=read_data_fn, pde_fn=pde_fn, output_fn=None
+    )
 
     # safely retrieve metric value for hydra-based hyperparameter optimization
     metric_value = pinnstorch.utils.get_metric_value(

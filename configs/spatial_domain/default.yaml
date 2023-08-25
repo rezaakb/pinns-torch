@@ -1,0 +1,3 @@
+_target_: src.data.domains.spatial.Interval
+x_interval: [-1, 1]
+

@@ -1,13 +1,14 @@
-import warnings, os
+import os
+import warnings
+from importlib.util import find_spec
+from typing import Any, Callable, Dict, Tuple
+
 import numpy as np
 import requests
 import scipy
-
-from importlib.util import find_spec
-from typing import Any, Callable, Dict, Tuple
 from omegaconf import DictConfig
-from pinnstorch.utils import pylogger, rich_utils
 
+from pinnstorch.utils import pylogger, rich_utils
 
 log = pylogger.get_pylogger(__name__)
 
@@ -65,16 +66,14 @@ def task_wrapper(task_func: Callable) -> Callable:
     :return: The wrapped task function.
     """
 
-    def wrap(cfg: DictConfig,
-             read_data_fn: Callable,
-             pde_fn: Callable,
-             output_fn: Callable) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    def wrap(
+        cfg: DictConfig, read_data_fn: Callable, pde_fn: Callable, output_fn: Callable
+    ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         # execute the task
         try:
-            metric_dict, object_dict = task_func(cfg=cfg,
-                                                 read_data_fn = read_data_fn,
-                                                 pde_fn = pde_fn,
-                                                 output_fn = output_fn)
+            metric_dict, object_dict = task_func(
+                cfg=cfg, read_data_fn=read_data_fn, pde_fn=pde_fn, output_fn=output_fn
+            )
 
         # things to do if exception occurs
         except Exception as ex:
@@ -112,26 +111,25 @@ def get_metric_value(metric_dict: Dict[str, Any], metric_names: list) -> float:
     :return: The value of the metric.
     """
     for type_metric, list_metrics in metric_names.items():
-        
-        if type_metric == 'extra_variables':
-            prefix = ''
-        elif type_metric == 'error':
-            prefix = 'val/error_'
-            
+        if type_metric == "extra_variables":
+            prefix = ""
+        elif type_metric == "error":
+            prefix = "val/error_"
+
         for metric_name in list_metrics:
             metric_name = f"{prefix}{metric_name}"
-            
+
             if not metric_name:
                 log.info("Metric name is None! Skipping metric value retrieval...")
                 return None
-        
+
             if metric_name not in metric_dict:
                 raise Exception(
                     f"Metric value not found! <metric_name={metric_name}>\n"
                     "Make sure metric name logged in LightningModule is correct!\n"
                     "Make sure `optimized_metric` name in `hparams_search` config is correct!"
                 )
-        
+
             metric_value = metric_dict[metric_name].item()
             log.info(f"Retrieved metric value! <{metric_name}={metric_value}>")
 
@@ -149,12 +147,13 @@ def download_file(path, folder_name, filename):
     else:
         FileNotFoundError("File download failed.")
 
+
 def load_data_txt(root_path, file_name):
     path = os.path.join(root_path, file_name)
     if os.path.exists(path):
         log.info("Weights are available.")
     else:
-        download_file(path, 'irk_weights', file_name)
+        download_file(path, "irk_weights", file_name)
 
     return np.float32(np.loadtxt(path, ndmin=2))
 
@@ -164,7 +163,6 @@ def load_data(root_path, file_name):
     if os.path.exists(path):
         log.info("Data is available.")
     else:
-        download_file(path, 'data', file_name)
+        download_file(path, "data", file_name)
 
     return scipy.io.loadmat(path)
-

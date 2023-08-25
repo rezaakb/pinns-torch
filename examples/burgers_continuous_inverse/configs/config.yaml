@@ -1,74 +1,72 @@
 defaults:
-    -  ../../../configs/train
-    - _self_
-    - hydra: default
+  - ../../../configs/train
+  - _self_
 
 N_u: 2_000
 
 time_domain:
-    _target_: pinnstorch.data.TimeDomain
-    t_interval: [0, 0.99]
-    t_points: 100
+  _target_: pinnstorch.data.TimeDomain
+  t_interval: [0, 0.99]
+  t_points: 100
 
 spatial_domain:
-    _target_: pinnstorch.data.Interval
-    x_interval: [-1, 1]
-    shape: [256, 1]
-
+  _target_: pinnstorch.data.Interval
+  x_interval: [-1, 1]
+  shape: [256, 1]
 
 mesh:
-    _target_: pinnstorch.data.Mesh
-    root_dir: ${paths.data_dir}
-    read_data_fn: ???
+  _target_: pinnstorch.data.Mesh
+  root_dir: ${paths.data_dir}
+  read_data_fn: ???
 
 train_datasets:
-    - mesh_sampler:
-        _target_: pinnstorch.data.MeshSampler
-        _partial_: true
-        num_sample: ${N_u}
-        solution:
-            - u
-        collection_points:
-            - f
-        
+  - mesh_sampler:
+      _target_: pinnstorch.data.MeshSampler
+      _partial_: true
+      num_sample: ${N_u}
+      solution:
+        - u
+      collection_points:
+        - f
+
 val_dataset:
-    - mesh_sampler:
-        _target_: pinnstorch.data.MeshSampler
-        _partial_: true
-        solution:
-            - u
-    
-net:
-    _target_: pinnstorch.models.FCN
-    layers: [2, 20, 20, 20, 20, 20, 20, 20, 20, 1]
-    output_names:
+  - mesh_sampler:
+      _target_: pinnstorch.data.MeshSampler
+      _partial_: true
+      solution:
         - u
 
+net:
+  _target_: pinnstorch.models.FCN
+  layers: [2, 20, 20, 20, 20, 20, 20, 20, 20, 1]
+  output_names:
+    - u
+
 trainer:
-    accelerator: gpu
-    max_epochs: 20000
-    devices: [0]
-    deterministic: false
-    check_val_every_n_epoch: 1000
+  accelerator: gpu
+  max_epochs: 20000
+  devices: [0]
+  deterministic: false
+  check_val_every_n_epoch: 1000
 
 model:
-    loss_fn: mse
-    extra_variables:
-        l1: 0.0
-        l2: -6.0
-    
+  loss_fn: mse
+  extra_variables:
+    l1: 0.0
+    l2: -6.0
+
 train: true
 test: false
 optimized_metric:
-    error:
-        - u 
-    extra_variables:
-        - l1
-        - l2
+  error:
+    - u
+  extra_variables:
+    - l1
+    - l2
 
 plotting:
-    _target_: pinnstorch.utils.plot_burgers_continuous_inverse
-    _partial_: true
+  _target_: pinnstorch.utils.plot_burgers_continuous_inverse
+  _partial_: true
 
 seed: 1234
 task_name: burgers_continuous_inverse

@@ -1,7 +1,6 @@
 defaults:
-    -  ../../../configs/train
-    - _self_
-    - hydra: default
+  - ../../../configs/train
+  - _self_
 
 q: 81
 
@@ -12,96 +11,95 @@ idx_t1: 90
 discrete: True
 
 time_domain:
-    _target_: pinnstorch.data.TimeDomain
-    t_interval: [0, 0.99]
-    t_points: 100
+  _target_: pinnstorch.data.TimeDomain
+  t_interval: [0, 0.99]
+  t_points: 100
 
 spatial_domain:
-    _target_: pinnstorch.data.Interval
-    x_interval: [-1, 1]
-    shape: [256, 1]
-
+  _target_: pinnstorch.data.Interval
+  x_interval: [-1, 1]
+  shape: [256, 1]
 
 mesh:
-    _target_: pinnstorch.data.Mesh
-    root_dir: ${paths.data_dir}
-    read_data_fn: ???
+  _target_: pinnstorch.data.Mesh
+  root_dir: ${paths.data_dir}
+  read_data_fn: ???
 
 runge_kutta:
-    _target_: pinnstorch.models.RungeKutta
-    root_dir: ${paths.rk_dir}
-    q: ${q}
-    t1: ${idx_t0}
-    t2: ${idx_t1}
-    time_domain: ${time_domain}
+  _target_: pinnstorch.models.RungeKutta
+  root_dir: ${paths.rk_dir}
+  q: ${q}
+  t1: ${idx_t0}
+  t2: ${idx_t1}
+  time_domain: ${time_domain}
 
 train_datasets:
-    - mesh_sampler:
-        _target_: pinnstorch.data.DiscreteMeshSampler
-        _partial_: true
-        num_sample: ${N0}
-        idx_t: ${idx_t0}
-        solution:
-            - u
-        collection_points:
-            - f
-    - mesh_sampler:
-        _target_: pinnstorch.data.DiscreteMeshSampler
-        _partial_: true
-        num_sample: ${N1}
-        idx_t: ${idx_t1}
-        solution:
-            - u
-        collection_points:
-            - f
+  - mesh_sampler:
+      _target_: pinnstorch.data.DiscreteMeshSampler
+      _partial_: true
+      num_sample: ${N0}
+      idx_t: ${idx_t0}
+      solution:
+        - u
+      collection_points:
+        - f
+  - mesh_sampler:
+      _target_: pinnstorch.data.DiscreteMeshSampler
+      _partial_: true
+      num_sample: ${N1}
+      idx_t: ${idx_t1}
+      solution:
+        - u
+      collection_points:
+        - f
 
 val_dataset:
-    - mesh_sampler:
-        _target_: pinnstorch.data.DiscreteMeshSampler
-        _partial_: true
-        idx_t: ${idx_t1}
-        solution:
-            - u
-    
-net:
-    _target_: pinnstorch.models.FCN
-    layers:
-        - 1
-        - 50
-        - 50
-        - 50
-        - 50
-        - ${q}
-    output_names:
+  - mesh_sampler:
+      _target_: pinnstorch.data.DiscreteMeshSampler
+      _partial_: true
+      idx_t: ${idx_t1}
+      solution:
         - u
-    discrete: ${discrete}
+
+net:
+  _target_: pinnstorch.models.FCN
+  layers:
+    - 1
+    - 50
+    - 50
+    - 50
+    - 50
+    - ${q}
+  output_names:
+    - u
+  discrete: ${discrete}
 
 trainer:
-    accelerator: gpu
-    max_epochs: 40000
-    devices: [0]
-    deterministic: false
-    check_val_every_n_epoch: 1000
+  accelerator: gpu
+  max_epochs: 40000
+  devices: [0]
+  deterministic: false
+  check_val_every_n_epoch: 1000
 
 model:
-    loss_fn: sse
-    runge_kutta: ${runge_kutta}
-    extra_variables:
-        l1: 0.0
-        l2: -6.0
-    
+  loss_fn: sse
+  runge_kutta: ${runge_kutta}
+  extra_variables:
+    l1: 0.0
+    l2: -6.0
+
 train: true
 test: false
 optimized_metric:
-    error:
-        - u
-    extra_variables:
-        - l1
-        - l2
+  error:
+    - u
+  extra_variables:
+    - l1
+    - l2
 
 plotting:
-    _target_: pinnstorch.utils.plot_burgers_discrete_inverse
-    _partial_: true
+  _target_: pinnstorch.utils.plot_burgers_discrete_inverse
+  _partial_: true
 
 seed: 1234
 task_name: burgers_discrete_inverse

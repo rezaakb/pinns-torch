@@ -1,6 +1,6 @@
 task_name: ac
 tags:
-- dev
+  - dev
 train: true
 test: false
 compile: false
@@ -22,37 +22,37 @@ model:
 time_domain:
   _target_: src.data.domains.time.TimeDomain
   t_interval:
-  - 0
-  - 1
+    - 0
+    - 1
   t_points: 201
 spatial_domain:
   _target_: src.data.domains.spatial.Interval
   x_interval:
-  - -1
-  - 0.99609375
+    - -1
+    - 0.99609375
   shape:
-  - 512
-  - 1
+    - 512
+    - 1
 mesh:
   _target_: src.data.mesh.mesh.Mesh
   root_dir: ${paths.data_dir}
   read_data_fn: ???
   ub:
-  - 1.0
-  - 1.0
+    - 1.0
+    - 1.0
   lb:
-  - -1.0
-  - 0.0
+    - -1.0
+    - 0.0
 net:
   _target_: src.models.net.neural_net.FCN
   _partial_: true
   layers:
-  - 1
-  - 200
-  - 200
-  - 200
-  - 200
-  - ${eval:'${q} + 1'}
+    - 1
+    - 200
+    - 200
+    - 200
+    - 200
+    - ${eval:'${q} + 1'}
 callbacks: null
 logger: null
 trainer:
@@ -62,7 +62,7 @@ trainer:
   max_epochs: 80000
   accelerator: gpu
   devices:
-  - 0
+    - 0
   check_val_every_n_epoch: 1000
   deterministic: false
 paths:
@@ -78,7 +78,7 @@ extras:
   print_config: true
 idx_t0: 20
 idx_t1: 180
-'N': 200
+"N": 200
 q: 100
 runge_kutta:
   _target_: src.models.runge_kutta.RungeKutta
@@ -88,23 +88,23 @@ runge_kutta:
   t2: ${idx_t1}
   time_domain: ${time_domain}
 train_datasets:
-- mesh_sampler:
-    _target_: src.data.sampler.mesh_sampler.MeshSampler
-    _partial_: true
-    num_sample: ${N}
-    idx_t: ${idx_t0}
-- periodic_boundary_condition:
-    _target_: src.data.sampler.boundary_condition.PeriodicBoundaryCondition
-    _partial_: true
-    idx_t: ${idx_t1}
-    derivative_order: 1
+  - mesh_sampler:
+      _target_: src.data.sampler.mesh_sampler.MeshSampler
+      _partial_: true
+      num_sample: ${N}
+      idx_t: ${idx_t0}
+  - periodic_boundary_condition:
+      _target_: src.data.sampler.boundary_condition.PeriodicBoundaryCondition
+      _partial_: true
+      idx_t: ${idx_t1}
+      derivative_order: 1
 val_datasets:
-- mesh_sampler:
-    _target_: src.data.sampler.mesh_sampler.MeshSampler
-    _partial_: true
-    idx_t: ${idx_t1}
+  - mesh_sampler:
+      _target_: src.data.sampler.mesh_sampler.MeshSampler
+      _partial_: true
+      idx_t: ${idx_t1}
 optimized_metric:
-- val/error
+  - val/error
 plotting:
   _target_: src.utils.plotting.plot_ac
   _partial_: true

@@ -1,93 +1,91 @@
 defaults:
-    -  ../../../configs/train
-    - _self_
-    - hydra: default
+  - ../../../configs/train
+  - _self_
 
 N0: 50
 N_b: 50
 N_f: 20_000
 
 time_domain:
-    _target_: pinnstorch.data.TimeDomain
-    t_interval: [0, 1.57079633]
-    t_points: 201
+  _target_: pinnstorch.data.TimeDomain
+  t_interval: [0, 1.57079633]
+  t_points: 201
 
 spatial_domain:
-    _target_: pinnstorch.data.Interval
-    x_interval: [-5, 4.9609375]
-    shape: [256, 1]
-
+  _target_: pinnstorch.data.Interval
+  x_interval: [-5, 4.9609375]
+  shape: [256, 1]
 
 mesh:
-    _target_: pinnstorch.data.Mesh
-    root_dir: ${paths.data_dir}
-    read_data_fn: ???
-    ub: [5.0, 1.57079633]
-    lb: [-5.0, 0.0]
+  _target_: pinnstorch.data.Mesh
+  root_dir: ${paths.data_dir}
+  read_data_fn: ???
+  ub: [5.0, 1.57079633]
+  lb: [-5.0, 0.0]
 
 train_datasets:
-    - mesh_sampler:
-        _target_: pinnstorch.data.MeshSampler
-        _partial_: true
-        num_sample: ${N_f}
-        collection_points:
-            - f_u
-            - f_v
-            
-    - initial_condition:
-        _target_: pinnstorch.data.InitialCondition
-        _partial_: true
-        num_sample: ${N0}
-        solution:
-            - u
-            - v
-            
-    - periodic_boundary_condition:
-        _target_: pinnstorch.data.PeriodicBoundaryCondition
-        _partial_: true
-        num_sample: ${N_b}
-        derivative_order: 1
-        solution:
-            - u
-            - v
-        
-val_dataset:
-    - mesh_sampler:
-        _target_: pinnstorch.data.MeshSampler
-        _partial_: true
-        solution:
-            - u
-            - v
-            - h
-    
-net:
-    _target_: pinnstorch.models.FCN
-    layers: [2, 100, 100, 100, 100, 2]
-    output_names:
+  - mesh_sampler:
+      _target_: pinnstorch.data.MeshSampler
+      _partial_: true
+      num_sample: ${N_f}
+      collection_points:
+        - f_u
+        - f_v
+
+  - initial_condition:
+      _target_: pinnstorch.data.InitialCondition
+      _partial_: true
+      num_sample: ${N0}
+      solution:
         - u
         - v
 
-trainer:
-    accelerator: gpu
-    max_epochs: 50000
-    devices: [0]
-    deterministic: false
-    check_val_every_n_epoch: 1000
+  - periodic_boundary_condition:
+      _target_: pinnstorch.data.PeriodicBoundaryCondition
+      _partial_: true
+      num_sample: ${N_b}
+      derivative_order: 1
+      solution:
+        - u
+        - v
 
-model:
-    loss_fn: mse
-    
-train: true
-test: false
-optimized_metric:
-    error:
-        - u 
+val_dataset:
+  - mesh_sampler:
+      _target_: pinnstorch.data.MeshSampler
+      _partial_: true
+      solution:
+        - u
         - v
         - h
 
+net:
+  _target_: pinnstorch.models.FCN
+  layers: [2, 100, 100, 100, 100, 2]
+  output_names:
+    - u
+    - v
+
+trainer:
+  accelerator: gpu
+  max_epochs: 50000
+  devices: [0]
+  deterministic: false
+  check_val_every_n_epoch: 1000
+
+model:
+  loss_fn: mse
+
+train: true
+test: false
+optimized_metric:
+  error:
+    - u
+    - v
+    - h
+
 plotting:
-    _target_: pinnstorch.utils.plot_schrodinger
-    _partial_: true
+  _target_: pinnstorch.utils.plot_schrodinger
+  _partial_: true
 
 seed: 1234
 task_name: schrodinger
