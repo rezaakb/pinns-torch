@@ -1,7 +1,43 @@
 import hydra
 from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig
+import os
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
+import hydra
+import numpy as np
+import pytest
+import rootutils
+import torch
+from hydra.core.hydra_config import HydraConfig
+from omegaconf import DictConfig, open_dict
+
+import pinnstorch
+from pinnstorch.train import train
+from tests.helpers.run_if import RunIf
+
+
+def read_data_fn(root_path):
+    """Read and preprocess data from the specified root path.
+
+    :param root_path: The root directory containing the data.
+    :return: Processed data will be used in Mesh class.
+    """
+
+    data = pinnstorch.utils.load_data(root_path, "AC.mat")
+    exact_u = np.real(data["uu"])
+    return {"u": exact_u}
+
+
+def pde_fn(outputs, x, extra_variables):
+    """Define the partial differential equations (PDEs)."""
+
+    u = outputs["u"][:, :-1]
+    u_x = pinnstorch.utils.fwd_gradient(u, x)
+    u_xx = pinnstorch.utils.fwd_gradient(u_x, x)
+    outputs["f"] = 5.0 * u - 5.0 * u**3 + 0.0001 * u_xx
+    return outputs
 
 def test_train_config(cfg_train: DictConfig) -> None:
     """Tests the training configuration provided by the `cfg_train` pytest fixture.
@@ -11,11 +47,15 @@ def test_train_config(cfg_train: DictConfig) -> None:
     assert cfg_train
     assert cfg_train.data
     assert cfg_train.model
+    assert cfg_train.net
     assert cfg_train.trainer
 
     HydraConfig().set_config(cfg_train)
-
-    hydra.utils.instantiate(cfg_train.model)
+    
+    net = hydra.utils.instantiate(cfg_train.net)(lb=[0.0, 0.0], ub=[1.0, 1.0])
+    hydra.utils.instantiate(cfg_train.model)(
+        net=net, pde_fn=pde_fn, output_fn=output_fn
+    )
     hydra.utils.instantiate(cfg_train.trainer)
 
 
@@ -31,5 +71,8 @@ def test_eval_config(cfg_eval: DictConfig) -> None:
 
     HydraConfig().set_config(cfg_eval)
 
-    hydra.utils.instantiate(cfg_eval.model)
+    net = hydra.utils.instantiate(cfg_train.net)(lb=[0.0, 0.0], ub=[1.0, 1.0])
+    hydra.utils.instantiate(cfg_train.model)(
+        net=net, pde_fn=pde_fn, output_fn=output_fn
+    )
     hydra.utils.instantiate(cfg_eval.trainer)

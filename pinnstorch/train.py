@@ -43,11 +43,12 @@ def train(
         cfg.model.optimizer.capturable = True
         log.info("Model will be compiled. Disabling automatic optimization.")
         cfg.model.automatic_optimization = False
-        if len(cfg.trainer.devices) > 1:
-            log.info(
-                f"DDP is not supported for compiled model. Using device {cfg.trainer.devices[0]}"
-            )
-            cfg.trainer.devices = cfg.trainer.devices[0]
+        if isinstance(cfg.trainer.devices, list):
+            if len(cfg.trainer.devices) > 1:
+                log.info(
+                    f"DDP is not supported for compiled model. Using device {cfg.trainer.devices[0]}"
+                )
+                cfg.trainer.devices = cfg.trainer.devices[0]
     else:
         log.info("Model will not be compiled. Setting optimizer capturable attribute to False.")
         cfg.model.optimizer.capturable = False
