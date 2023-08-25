@@ -39,6 +39,7 @@ class FCN(nn.Module):
 
         input_layer = nn.Linear(layers[0], layers[1])
         initializer(input_layer.weight)
+        
         net.add_module(f"input", input_layer)
         net.add_module(f"activation_1", nn.Tanh())
 

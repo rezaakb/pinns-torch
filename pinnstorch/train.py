@@ -9,22 +9,6 @@ from lightning.pytorch.loggers import Logger
 from omegaconf import DictConfig, OmegaConf
 
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
-# ------------------------------------------------------------------------------------ #
-# the setup_root above is equivalent to:
-# - adding project root dir to PYTHONPATH
-#       (so you don't need to force user to install project as a package)
-#       (necessary before importing any local modules e.g. `from src import utils`)
-# - setting up PROJECT_ROOT environment variable
-#       (which is used as a base for paths in "configs/paths/default.yaml")
-#       (this way all filepaths are the same no matter where you run the code)
-# - loading environment variables from ".env" in root dir
-#
-# you can remove it if you:
-# 1. either install project as a package or move entry files to project root dir
-# 2. set `root_dir` to "." in "configs/paths/default.yaml"
-#
-# more info: https://github.com/ashleve/rootutils
-# ------------------------------------------------------------------------------------ #
 
 from pinnstorch import utils
 
@@ -68,19 +52,19 @@ def train(
 
     if cfg.get("time_domain"):
         log.info(f"Instantiating time domain <{cfg.time_domain._target_}>")
-        td: TimeDomain = hydra.utils.instantiate(cfg.time_domain)
+        td: pinnstorch.data.TimeDomain = hydra.utils.instantiate(cfg.time_domain)
 
     if cfg.get("spatial_domain"):
         log.info(f"Instantiating spatial domain <{cfg.spatial_domain._target_}>")
-        sd: SpatialDomain = hydra.utils.instantiate(cfg.spatial_domain)
+        sd: pinnstorch.data.SpatialDomain = hydra.utils.instantiate(cfg.spatial_domain)
 
     log.info(f"Instantiating mesh <{cfg.mesh._target_}>")
     if cfg.mesh._target_ == "pinnstorch.data.Mesh":
-        mesh: Mesh = hydra.utils.instantiate(
+        mesh: pinnstorch.data.Mesh = hydra.utils.instantiate(
             cfg.mesh, time_domain=td, spatial_domain=sd, read_data_fn=read_data_fn
         )
     elif cfg.mesh._target_ == "pinnstorch.data.PointCloud":
-        mesh: PointCloud = hydra.utils.instantiate(cfg.mesh, read_data_fn=read_data_fn)
+        mesh: pinnstorch.data.PointCloud = hydra.utils.instantiate(cfg.mesh, read_data_fn=read_data_fn)
     else:
         raise "Mesh should be defined in config file."
 

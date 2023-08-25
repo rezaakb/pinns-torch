@@ -67,6 +67,10 @@ Train model with chosen experiment configuration; for example, from [examples/na
 python examples/navier_stokes/train.py trainer.max_epochs=20 n_train=3000
 ```
 
+## Data
+
+The data located on the server and will be downloaded automatically upon running each example.
+
 ## Contributing
 
 We greatly value contributions from the community. If you identify any missing features, encounter bugs, or notice unexpected behavior while utilizing this library, we kindly invite you to open an issue or submit a pull request on GitHub. Alternatively, please feel free to reach out to the authors directly. Your input is highly appreciated and will help enhance the quality of our project.

@@ -152,8 +152,8 @@ configs/local/default.yaml
 
 # Aim logging
 .aim
-docs
-/docs/
+
 checkpoints
 /checkpoints/
 Untitled.ipynb
+/Untitled.ipynb
