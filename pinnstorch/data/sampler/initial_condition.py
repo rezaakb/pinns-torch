@@ -6,8 +6,7 @@ from .sampler_base import SamplerBase
 
 class InitialCondition(SamplerBase):
     def __init__(self, mesh, num_sample=None, solution=None, initial_fun=None):
-         """
-        Initialize an InitialCondition object for sampling initial condition data.
+        """Initialize an InitialCondition object for sampling initial condition data.
 
         :param mesh: Mesh object containing spatial and time domain information.
         :param num_sample: Number of samples.

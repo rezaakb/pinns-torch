@@ -9,10 +9,8 @@ from .sampler_base import SamplerBase
 
 
 class MeshSampler(SamplerBase):
-    """ 
-    Sample from Mesh for continous mode.
-    """
-    
+    """Sample from Mesh for continuous mode."""
+
     def __init__(
         self,
         mesh,
@@ -90,9 +88,8 @@ class MeshSampler(SamplerBase):
 
 
 class DiscreteMeshSampler(SamplerBase):
-    """ 
-    Sample from Mesh for discrete mode.
-    """
+    """Sample from Mesh for discrete mode."""
+
     def __init__(
         self,
         mesh,
@@ -130,18 +127,16 @@ class DiscreteMeshSampler(SamplerBase):
 
     @property
     def mode(self):
-        """
-        Get the current mode for RungeKutta class.
-    
+        """Get the current mode for RungeKutta class.
+
         :return: The current mode value.
         """
         return self._mode
 
     @mode.setter
     def mode(self, value):
-        """
-        Set the mode value by PINNDataModule for RungeKutta class.
-    
+        """Set the mode value by PINNDataModule for RungeKutta class.
+
         :param value: The mode value to be set.
         """
         self._mode = value

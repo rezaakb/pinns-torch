@@ -4,11 +4,11 @@ import hydra
 import lightning as L
 import rootutils
 import torch
-import pinnstorch
-
 from lightning import Callback, LightningDataModule, LightningModule, Trainer
 from lightning.pytorch.loggers import Logger
 from omegaconf import DictConfig, OmegaConf
+
+import pinnstorch
 
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
@@ -66,7 +66,9 @@ def train(
             cfg.mesh, time_domain=td, spatial_domain=sd, read_data_fn=read_data_fn
         )
     elif cfg.mesh._target_ == "pinnstorch.data.PointCloud":
-        mesh: pinnstorch.data.PointCloud = hydra.utils.instantiate(cfg.mesh, read_data_fn=read_data_fn)
+        mesh: pinnstorch.data.PointCloud = hydra.utils.instantiate(
+            cfg.mesh, read_data_fn=read_data_fn
+        )
     else:
         raise "Mesh should be defined in config file."
 

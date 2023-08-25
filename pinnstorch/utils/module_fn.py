@@ -2,9 +2,8 @@ import torch
 
 
 def sse(loss, preds, target=None, keys=None, mid=None):
-    """
-    Calculate the sum of squared errors (SSE) loss for given predictions and optional targets.
-    
+    """Calculate the sum of squared errors (SSE) loss for given predictions and optional targets.
+
     :param loss: Loss variable.
     :param preds: Dictionary containing prediction tensors for different keys.
     :param target: Dictionary containing target tensors (optional).
@@ -27,9 +26,8 @@ def sse(loss, preds, target=None, keys=None, mid=None):
 
 
 def mse(loss, preds, target=None, keys=None, mid=None):
-    """
-    Calculate the mean squared error (MSE) loss for given predictions and optional targets.
-    
+    """Calculate the mean squared error (MSE) loss for given predictions and optional targets.
+
     :param loss: Loss variable.
     :param preds: Dictionary containing prediction tensors for different keys.
     :param target: Dictionary containing target tensors (optional).
@@ -52,9 +50,8 @@ def mse(loss, preds, target=None, keys=None, mid=None):
 
 
 def relative_l2_error(preds, target):
-    """
-    Calculate the relative L2 error between predictions and target tensors.
-    
+    """Calculate the relative L2 error between predictions and target tensors.
+
     :param preds: Predicted tensors.
     :param target: Target tensors.
     :return: Relative L2 error value.
@@ -63,10 +60,9 @@ def relative_l2_error(preds, target):
 
 
 def fix_extra_variables(extra_variables):
-    """
-    Convert extra variables to torch tensors with gradient tracking.
-    These variables are trainables in inverse problems.
-    
+    """Convert extra variables to torch tensors with gradient tracking. These variables are
+    trainables in inverse problems.
+
     :param extra_variables: Dictionary of extra variables to be converted.
     :return: Dictionary of converted extra variables as torch tensors with gradients.
     """

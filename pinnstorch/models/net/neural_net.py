@@ -39,7 +39,7 @@ class FCN(nn.Module):
 
         input_layer = nn.Linear(layers[0], layers[1])
         initializer(input_layer.weight)
-        
+
         net.add_module("input", input_layer)
         net.add_module("activation_1", nn.Tanh())
 
@@ -146,10 +146,10 @@ class NetHFM(nn.Module):
 
         H = (torch.cat((*spatial, time), 1) - self.X_mean) / self.X_std
 
-        for l in range(0, self.num_layers - 1):
-            W = self.weights[l]
-            b = self.biases[l]
-            g = self.gammas[l]
+        for i in range(0, self.num_layers - 1):
+            W = self.weights[i]
+            b = self.biases[i]
+            g = self.gammas[i]
             # weight normalization
             V = W / torch.norm(W, dim=0)
             # matrix multiplication
@@ -157,7 +157,7 @@ class NetHFM(nn.Module):
             # add bias
             H = g * H + b
             # activation
-            if l < self.num_layers - 2:
+            if i < self.num_layers - 2:
                 H = H * self.sigmoid(H)
 
         outputs_dict = {name: H[:, i : i + 1] for i, name in enumerate(self.output_names)}

@@ -47,7 +47,7 @@ def pde_fn(outputs, x, y, z, t, extra_variables=None):
     :param y: Spatial coordinate y.
     :param z: Spatial coordinate z.
     :param t: Temporal coordinate t.
-    :param extra_variables: Additional variables if needed (optional).
+    :param extra_variables: Additional variables if available (optional).
     :return: Dictionary of computed PDE terms for each variable.
     """
 

@@ -5,9 +5,8 @@ from torch.utils.data import Dataset
 
 class SamplerBase(Dataset):
     def __init__(self):
-        """
-        Base class for sampling mesh data for training.
-        
+        """Base class for sampling mesh data for training.
+
         Initializes instance variables for storing sampled data and solutions.
         """
         self.time_domain_sampled = None

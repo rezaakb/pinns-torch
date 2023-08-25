@@ -253,11 +253,11 @@ class PINNModule(LightningModule):
         return self.static_loss
 
     def on_train_epoch_end(self):
-        """
-        Called at the end of each training epoch.
+        """Called at the end of each training epoch.
+
         If extra_variables are provided, logs each extra variable's value to the progress bar.
         """
-        
+
         if self.extra_variables:
             for key in self.extra_variables:
                 self.log(key, self.extra_variables[key], prog_bar=True)
@@ -363,7 +363,6 @@ class PINNModule(LightningModule):
         loss, error, preds = self.eval_step(batch)
 
         return preds
-        
 
     def configure_optimizers(self) -> Dict[str, Any]:
         """Configures optimizers and learning-rate schedulers to be used for training.

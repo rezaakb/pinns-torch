@@ -13,14 +13,13 @@ log = logging.getLogger(__name__)
 
 
 def figsize(scale, nplots=1):
-    """
-    Calculate the figure size based on a given scale and number of plots.
-    
+    """Calculate the figure size based on a given scale and number of plots.
+
     :param scale: Scaling factor for the figure size.
     :param nplots: Number of subplots in the figure (default is 1).
     :return: Calculated figure size in inches.
     """
-    
+
     fig_width_pt = 390.0  # Get this from LaTeX using \the\textwidth
     inches_per_pt = 1.0 / 72.27  # Convert pt to inch
     golden_mean = (np.sqrt(5.0) - 1.0) / 2.0  # Aesthetic ratio (you could change this)
@@ -36,30 +35,28 @@ import matplotlib.pyplot as plt
 
 
 def newfig(width, nplots=1):
-    """
-    Create a new figure with a specified width and number of subplots.
-    
+    """Create a new figure with a specified width and number of subplots.
+
     :param width: Width of the figure.
     :param nplots: Number of subplots in the figure (default is 1).
     :return: Created figure and subplot axis.
     """
-    
+
     fig = plt.figure(figsize=figsize(width, nplots))
     ax = fig.add_subplot(111)
     return fig, ax
 
 
 def savefig(filename, crop=True):
-    """
-    Save a figure to the specified filename with optional cropping.
-    
+    """Save a figure to the specified filename with optional cropping.
+
     :param filename: Name of the output file (without extension).
     :param crop: Whether to apply tight cropping to the saved image (default is True).
     """
-    
+
     log.info(f"Image saved at {filename}")
 
-    if crop == True:
+    if crop:
         plt.savefig(f"{filename}.pdf", bbox_inches="tight", pad_inches=0)
         plt.savefig(f"{filename}.eps", bbox_inches="tight", pad_inches=0)
     else:
@@ -68,10 +65,8 @@ def savefig(filename, crop=True):
 
 
 def plot_navier_stokes(mesh, preds, train_datasets, val_dataset, file_name):
-    """
-    Plot Navier-Stokes continuous inverse PDE
-    """
-    
+    """Plot Navier-Stokes continuous inverse PDE."""
+
     x, t, u = train_datasets[0][:]
     p_star = mesh.solution["p"][:, 100]
     p_pred = preds["p"].reshape(p_star.shape)
@@ -132,10 +127,8 @@ def plot_navier_stokes(mesh, preds, train_datasets, val_dataset, file_name):
 
 
 def plot_kdv(mesh, preds, train_datasets, val_dataset, file_name):
-    """
-    Plot KdV discrete inverse PDE
-    """
-    
+    """Plot KdV discrete inverse PDE."""
+
     fig, ax = newfig(1.0, 1.2)
     ax.axis("off")
 
@@ -203,10 +196,8 @@ def plot_kdv(mesh, preds, train_datasets, val_dataset, file_name):
 
 
 def plot_ac(mesh, preds, train_datasets, val_dataset, file_name):
-    """
-    Plot Allen-Cahn discrete forward PDE
-    """
-    
+    """Plot Allen-Cahn discrete forward PDE."""
+
     fig, ax = newfig(1.0, 1.2)
 
     x0 = train_datasets[0].spatial_domain_sampled[0].detach().numpy()
@@ -276,10 +267,8 @@ def plot_ac(mesh, preds, train_datasets, val_dataset, file_name):
 
 
 def plot_burgers_discrete_forward(mesh, preds, train_datasets, val_dataset, file_name):
-    """
-    Plot burgers discrete forward PDE
-    """
-    
+    """Plot burgers discrete forward PDE."""
+
     fig, ax = newfig(1.0, 1.2)
 
     x0 = train_datasets[0].spatial_domain_sampled[0].detach().numpy()
@@ -349,10 +338,8 @@ def plot_burgers_discrete_forward(mesh, preds, train_datasets, val_dataset, file
 
 
 def plot_burgers_discrete_inverse(mesh, preds, train_datasets, val_dataset, file_name):
-    """
-    Plot burgers continuous forward PDE
-    """
-    
+    """Plot burgers continuous forward PDE."""
+
     fig, ax = newfig(1.0, 1.2)
 
     x0 = train_datasets[0].spatial_domain_sampled[0].detach().numpy()
@@ -405,7 +392,7 @@ def plot_burgers_discrete_inverse(mesh, preds, train_datasets, val_dataset, file
     ax.set_xlabel("$x$")
     ax.set_ylabel("$u(t,x)$")
     ax.set_title(
-        "$t = %.2f$\n%d trainng data" % (mesh.time_domain[idx_t0], u0.shape[0]), fontsize=10
+        "$t = %.2f$\n%d training data" % (mesh.time_domain[idx_t0], u0.shape[0]), fontsize=10
     )
 
     ax = plt.subplot(gs1[0, 1])
@@ -414,7 +401,7 @@ def plot_burgers_discrete_inverse(mesh, preds, train_datasets, val_dataset, file
     ax.set_xlabel("$x$")
     ax.set_ylabel("$u(t,x)$")
     ax.set_title(
-        "$t = %.2f$\n%d trainng data" % (mesh.time_domain[idx_t1], u1.shape[0]), fontsize=10
+        "$t = %.2f$\n%d training data" % (mesh.time_domain[idx_t1], u1.shape[0]), fontsize=10
     )
     ax.legend(loc="upper center", bbox_to_anchor=(-0.3, -0.3), ncol=2, frameon=False)
 
@@ -422,10 +409,8 @@ def plot_burgers_discrete_inverse(mesh, preds, train_datasets, val_dataset, file
 
 
 def plot_schrodinger(mesh, preds, train_datasets, val_dataset, file_name):
-    """
-    Plot schrodinger continuous forward PDE
-    """
-    
+    """Plot schrodinger continuous forward PDE."""
+
     h_pred = preds["h"]
     Exact_h = mesh.solution["h"]
     H_pred = h_pred.reshape(Exact_h.shape)
@@ -521,10 +506,8 @@ def plot_schrodinger(mesh, preds, train_datasets, val_dataset, file_name):
 
 
 def plot_burgers_continuous_forward(mesh, preds, train_datasets, val_dataset, file_name):
-    """
-    Plot burgers continuous forward PDE
-    """
-    
+    """Plot burgers continuous forward PDE."""
+
     U_pred = preds["u"]
     exact_u = mesh.solution["u"]
     x = mesh.spatial_domain[:]
@@ -620,10 +603,8 @@ def plot_burgers_continuous_forward(mesh, preds, train_datasets, val_dataset, fi
 
 
 def plot_burgers_continuous_inverse(mesh, preds, train_datasets, val_datasets, file_name):
-    """
-    Plot burgers continuous inverse PDE
-    """
-    
+    """Plot burgers continuous inverse PDE."""
+
     U_pred = preds["u"]
 
     exact_u = mesh.solution["u"]
