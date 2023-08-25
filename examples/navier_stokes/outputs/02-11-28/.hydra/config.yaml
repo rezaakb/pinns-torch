@@ -1,0 +1,131 @@
+task_name: navier_stokes
+tags:
+- dev
+train: true
+test: false
+compile: false
+ckpt_path: null
+seed: null
+data:
+  _target_: src.data.pinn_datamodule.PINNDataModule
+model:
+  _target_: src.models.pinn_module.PINNModule
+  _partial_: true
+  optimizer:
+    _target_: torch.optim.Adam
+    _partial_: true
+    lr: 0.001
+    weight_decay: 0.0
+    capturable: true
+  extra_variables:
+    l1: 0.0
+    l2: 0.0
+time_domain:
+  _target_: src.data.domains.time.TimeDomain
+  t_interval:
+  - 0
+  - 19.9
+spatial_domain:
+  _target_: src.data.domains.spatial.Rectangle
+  x_interval:
+  - 1
+  - 8
+  y_interval:
+  - -2
+  - 2
+  shape:
+  - 100
+  - 50
+mesh:
+  _target_: src.data.mesh.mesh.Mesh
+  root_dir: ${paths.data_dir}
+  read_data_fn: ???
+net:
+  _target_: src.models.net.neural_net.FCN
+  _partial_: true
+  layers:
+  - 3
+  - 20
+  - 20
+  - 20
+  - 20
+  - 20
+  - 20
+  - 20
+  - 20
+  - 2
+callbacks:
+  model_checkpoint:
+    _target_: lightning.pytorch.callbacks.ModelCheckpoint
+    dirpath: ${paths.output_dir}/checkpoints
+    filename: epoch_{epoch:03d}
+    monitor: val/loss
+    verbose: false
+    save_last: true
+    save_top_k: 1
+    mode: min
+    auto_insert_metric_name: false
+    save_weights_only: false
+    every_n_train_steps: null
+    train_time_interval: null
+    every_n_epochs: null
+    save_on_train_epoch_end: null
+  early_stopping:
+    _target_: lightning.pytorch.callbacks.EarlyStopping
+    monitor: val/loss
+    min_delta: 0.0
+    patience: 100
+    verbose: false
+    mode: min
+    strict: true
+    check_finite: true
+    stopping_threshold: null
+    divergence_threshold: null
+    check_on_train_epoch_end: null
+  model_summary:
+    _target_: lightning.pytorch.callbacks.RichModelSummary
+    max_depth: -1
+  rich_progress_bar:
+    _target_: lightning.pytorch.callbacks.RichProgressBar
+logger:
+  csv:
+    _target_: lightning.pytorch.loggers.csv_logs.CSVLogger
+    save_dir: ${paths.output_dir}
+    name: csv/
+    prefix: ''
+trainer:
+  _target_: lightning.pytorch.trainer.Trainer
+  default_root_dir: ${paths.output_dir}
+  min_epochs: 1
+  max_epochs: 400000
+  accelerator: gpu
+  devices: 1
+  check_val_every_n_epoch: 10000
+  deterministic: false
+paths:
+  root_dir: ${oc.env:PROJECT_ROOT}
+  data_dir: ${paths.root_dir}/data/
+  log_dir: ${paths.root_dir}/logs/
+  output_dir: ${hydra:runtime.output_dir}
+  work_dir: ${hydra:runtime.cwd}
+extras:
+  ignore_warnings: false
+  enforce_tags: true
+  print_config: true
+n_train: 5000
+train_datasets:
+- mesh_sampler:
+    _target_: src.data.sampler.mesh_sampler.MeshSampler
+    _partial_: true
+    num_sample: ${n_train}
+    use_data: true
+val_datasets:
+- mesh_sampler:
+    _target_: src.data.sampler.mesh_sampler.MeshSampler
+    _partial_: true
+optimized_metric:
+- l1
+- l2
+plotting:
+  _target_: src.utils.plotting.plot_navier_stokes
+  _partial_: true

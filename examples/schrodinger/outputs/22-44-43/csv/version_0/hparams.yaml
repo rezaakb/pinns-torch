@@ -1,0 +1,57 @@
+model:
+  _target_: src.models.pinn_module.PINNModule
+  _partial_: true
+  loss_fn: mse
+  optimizer:
+    _target_: torch.optim.Adam
+    _partial_: true
+    lr: 0.001
+    weight_decay: 0.0
+    capturable: true
+model/params/total: 30802
+model/params/trainable: 30802
+model/params/non_trainable: 0
+data:
+  _target_: src.data.pinn_datamodule.PINNDataModule
+trainer:
+  _target_: lightning.pytorch.trainer.Trainer
+  default_root_dir: ${paths.output_dir}
+  min_epochs: 1
+  max_epochs: 50000
+  accelerator: gpu
+  devices:
+  - 0
+  check_val_every_n_epoch: 1000
+  inference_mode: false
+  log_every_n_steps: 1
+  deterministic: false
+callbacks:
+  model_checkpoint:
+    _target_: lightning.pytorch.callbacks.ModelCheckpoint
+    dirpath: ${paths.output_dir}/checkpoints
+    filename: epoch_{epoch:03d}_{val/loss}
+    monitor: val/loss
+    verbose: null
+    save_last: true
+    save_top_k: 1
+    mode: min
+    auto_insert_metric_name: false
+    save_weights_only: false
+    every_n_train_steps: null
+    train_time_interval: null
+    every_n_epochs: null
+    save_on_train_epoch_end: null
+  model_summary:
+    _target_: lightning.pytorch.callbacks.RichModelSummary
+    max_depth: -1
+  rich_progress_bar:
+    _target_: lightning.pytorch.callbacks.RichProgressBar
+extras:
+  ignore_warnings: false
+  enforce_tags: true
+  print_config: true
+task_name: schrodinger
+tags:
+- dev
+ckpt_path: null
+seed: 1234

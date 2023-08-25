@@ -1,0 +1,86 @@
+defaults:
+    -  ../../../configs/train
+    - _self_
+    - hydra: default
+
+batch_size: 70_000
+
+mesh:
+    _target_: pinnstorch.data.PointCloud
+    root_dir: ${paths.data_dir}
+    read_data_fn: ???
+
+train_datasets:
+    - mesh_sampler:
+        _target_: pinnstorch.data.MeshSampler
+        _partial_: true
+        solution:
+            - c
+        collection_points:
+            - e1
+            - e2
+            - e3
+            - e4
+            - e5
+        
+        
+val_dataset:
+    - mesh_sampler:
+        _target_: pinnstorch.data.MeshSampler
+        _partial_: true
+        solution:
+            - c 
+            - u
+            - v
+            - w
+            - p
+
+test_dataset:
+    - mesh_sampler:
+        _target_: pinnstorch.data.MeshSampler
+        _partial_: true
+        idx_t: 100
+        solution:
+            - c 
+            - u
+            - v
+            - w
+            - p
+            
+net:
+    _target_: pinnstorch.models.NetHFM
+    layers: [4, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 5]
+    output_names:
+        - c 
+        - u
+        - v
+        - w
+        - p
+
+model:
+    loss_fn: mse
+    
+trainer:
+    accelerator: gpu
+    max_epochs: 140
+    devices:
+        - 0
+        - 1
+        - 2
+        - 3
+    deterministic: false
+    check_val_every_n_epoch: 1
+    
+train: true
+test: true
+compile: false
+optimized_metric:
+    error:
+        - c
+        - u
+        - v
+        - w
+
+task_name: aneurysm3D
+
+ckpt_path: examples/aneurysm3D/outputs/21-52-16/checkpoints/last.ckpt

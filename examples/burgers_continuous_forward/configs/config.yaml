@@ -1,0 +1,81 @@
+defaults:
+    -  ../../../configs/train
+    - _self_
+    - hydra: default
+
+N0: 50
+N_b: 50
+N_f: 10_000
+
+time_domain:
+    _target_: pinnstorch.data.TimeDomain
+    t_interval: [0, 0.99]
+    t_points: 100
+
+spatial_domain:
+    _target_: pinnstorch.data.Interval
+    x_interval: [-1, 1]
+    shape: [256, 1]
+
+
+mesh:
+    _target_: pinnstorch.data.Mesh
+    root_dir: ${paths.data_dir}
+    read_data_fn: ???
+
+train_datasets:
+    - mesh_sampler:
+        _target_: pinnstorch.data.MeshSampler
+        _partial_: true
+        num_sample: ${N_f}
+        collection_points:
+            - f
+    - initial_condition:
+        _target_: pinnstorch.data.InitialCondition
+        _partial_: true
+        num_sample: ${N0}
+        solution:
+            - u
+    - dirichlet_boundary_condition:
+        _target_: pinnstorch.data.DirichletBoundaryCondition
+        _partial_: true
+        num_sample: ${N_b}
+        solution:
+            - u
+        
+val_dataset:
+    - mesh_sampler:
+        _target_: pinnstorch.data.MeshSampler
+        _partial_: true
+        solution:
+            - u
+    
+net:
+    _target_: pinnstorch.models.FCN
+    layers: [2, 20, 20, 20, 20, 20, 20, 20, 20, 1]
+    output_names:
+        - u
+
+trainer:
+    accelerator: gpu
+    max_epochs: 10000
+    devices: [0]
+    deterministic: false
+    check_val_every_n_epoch: 100
+
+model:
+    loss_fn: mse
+    
+train: true
+val: true
+test: true
+optimized_metric:
+    error:
+        - u 
+
+plotting:
+    _target_: pinnstorch.utils.plot_burgers_continuous_forward
+    _partial_: true
+
+seed: 1234
+task_name: burgers_continuous_forward

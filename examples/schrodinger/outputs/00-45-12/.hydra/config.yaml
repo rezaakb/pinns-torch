@@ -1,0 +1,150 @@
+task_name: schrodinger
+tags:
+- dev
+train: true
+test: false
+compile: true
+ckpt_path: null
+seed: 1234
+data:
+  _target_: pinnstorch.data.PINNDataModule
+model:
+  _target_: pinnstorch.models.PINNModule
+  _partial_: true
+  loss_fn: mse
+  automatic_optimization: false
+  optimizer:
+    _target_: torch.optim.Adam
+    _partial_: true
+    lr: 0.001
+    weight_decay: 0.0
+    capturable: true
+net:
+  _target_: pinnstorch.models.FCN
+  _partial_: true
+  layers:
+  - 2
+  - 100
+  - 100
+  - 100
+  - 100
+  - 2
+  output_names:
+  - u
+  - v
+callbacks:
+  model_checkpoint:
+    _target_: lightning.pytorch.callbacks.ModelCheckpoint
+    dirpath: ${paths.output_dir}/checkpoints
+    filename: epoch_{epoch:03d}_{val/loss}
+    monitor: val/loss
+    verbose: null
+    save_last: true
+    save_top_k: 1
+    mode: min
+    auto_insert_metric_name: false
+    save_weights_only: false
+    every_n_train_steps: null
+    train_time_interval: null
+    every_n_epochs: null
+    save_on_train_epoch_end: null
+  model_summary:
+    _target_: lightning.pytorch.callbacks.RichModelSummary
+    max_depth: -1
+  rich_progress_bar:
+    _target_: lightning.pytorch.callbacks.RichProgressBar
+logger:
+  csv:
+    _target_: lightning.pytorch.loggers.csv_logs.CSVLogger
+    save_dir: ${paths.output_dir}
+    name: csv/
+    prefix: ''
+trainer:
+  _target_: lightning.pytorch.trainer.Trainer
+  default_root_dir: ${paths.output_dir}
+  min_epochs: 1
+  max_epochs: 50000
+  accelerator: gpu
+  devices:
+  - 0
+  check_val_every_n_epoch: 1000
+  inference_mode: false
+  log_every_n_steps: 1
+  deterministic: false
+paths:
+  root_dir: ${oc.env:PROJECT_ROOT}
+  data_dir: ${paths.root_dir}/data/
+  rk_dir: ${paths.root_dir}/data/irk_weights
+  log_dir: ${paths.root_dir}/logs/
+  output_dir: ${hydra:runtime.output_dir}
+  work_dir: ${hydra:runtime.cwd}
+extras:
+  ignore_warnings: false
+  enforce_tags: true
+  print_config: true
+N0: 50
+N_b: 50
+N_f: 20000
+time_domain:
+  _target_: pinnstorch.data.TimeDomain
+  t_interval:
+  - 0
+  - 1.57079633
+  t_points: 201
+spatial_domain:
+  _target_: pinnstorch.data.Interval
+  x_interval:
+  - -5
+  - 4.9609375
+  shape:
+  - 256
+  - 1
+mesh:
+  _target_: pinnstorch.data.Mesh
+  root_dir: ${paths.data_dir}
+  read_data_fn: ???
+  ub:
+  - 5.0
+  - 1.57079633
+  lb:
+  - -5.0
+  - 0.0
+train_datasets:
+- mesh_sampler:
+    _target_: pinnstorch.data.MeshSampler
+    _partial_: true
+    num_sample: ${N_f}
+    collection_points:
+    - f_u
+    - f_v
+- initial_condition:
+    _target_: pinnstorch.data.InitialCondition
+    _partial_: true
+    num_sample: ${N0}
+    solution:
+    - u
+    - v
+- periodic_boundary_condition:
+    _target_: pinnstorch.data.PeriodicBoundaryCondition
+    _partial_: true
+    num_sample: ${N_b}
+    derivative_order: 1
+    solution:
+    - u
+    - v
+val_dataset:
+- mesh_sampler:
+    _target_: pinnstorch.data.MeshSampler
+    _partial_: true
+    solution:
+    - u
+    - v
+    - h
+optimized_metric:
+  error:
+  - u
+  - v
+  - h
+plotting:
+  _target_: pinnstorch.utils.plot_schrodinger
+  _partial_: true

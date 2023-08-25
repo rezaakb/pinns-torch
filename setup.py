@@ -3,13 +3,13 @@
 from setuptools import find_packages, setup
 
 setup(
-    name="src",
+    name="pinnstorch",
     version="0.0.1",
-    description="Describe Your Cool Project",
+    description="An implementaion of PINNs using Lightning and Hydra.",
     author="",
-    author_email="",
-    url="https://github.com/user/project",
-    install_requires=["lightning", "hydra-core"],
+    author_email="reza.akbarianbafghi@coloardo.edu",
+    url="https://github.com/rezaakb/pinns-torch",
+    install_requires=["lightning", "hydra-core", "scipy", "PyDOE"],
     packages=find_packages(),
     # use this to customize global commands available in the terminal after installing the package
     entry_points={

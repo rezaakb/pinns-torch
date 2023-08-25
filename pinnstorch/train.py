@@ -1,0 +1,225 @@
+from typing import Any, Dict, List, Optional, Tuple
+
+import hydra
+import lightning as L
+import rootutils
+import torch
+from lightning import Callback, LightningDataModule, LightningModule, Trainer
+from lightning.pytorch.loggers import Logger
+from omegaconf import DictConfig, OmegaConf
+
+rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
+# ------------------------------------------------------------------------------------ #
+# the setup_root above is equivalent to:
+# - adding project root dir to PYTHONPATH
+#       (so you don't need to force user to install project as a package)
+#       (necessary before importing any local modules e.g. `from src import utils`)
+# - setting up PROJECT_ROOT environment variable
+#       (which is used as a base for paths in "configs/paths/default.yaml")
+#       (this way all filepaths are the same no matter where you run the code)
+# - loading environment variables from ".env" in root dir
+#
+# you can remove it if you:
+# 1. either install project as a package or move entry files to project root dir
+# 2. set `root_dir` to "." in "configs/paths/default.yaml"
+#
+# more info: https://github.com/ashleve/rootutils
+# ------------------------------------------------------------------------------------ #
+
+from pinnstorch import utils
+
+log = utils.get_pylogger(__name__)
+
+OmegaConf.register_new_resolver("eval", eval)
+
+@utils.task_wrapper
+def train(cfg: DictConfig, read_data_fn, pde_fn, output_fn) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    """Trains the model. Can additionally evaluate on a testset, using best weights obtained during
+    training.
+
+    This method is wrapped in optional @task_wrapper decorator, that controls the behavior during
+    failure. Useful for multiruns, saving info about the crash, etc.
+
+    :param cfg: A DictConfig configuration composed by Hydra.
+    :return: A tuple with metrics and dict with all instantiated objects.
+    """
+    if cfg.compile:
+        log.info("Model will be compiled. Setting optimizer capturable attribute to True.")
+        cfg.model.optimizer.capturable = True
+        log.info("Model will be compiled. Disabling automatic optimization.")
+        cfg.model.automatic_optimization = False
+        if len(cfg.trainer.devices)>1:
+            log.info(f"DDP is not supported for compiled model. Using device {cfg.trainer.devices[0]}")
+            cfg.trainer.devices = cfg.trainer.devices[0]
+    else:
+        log.info("Model will not be compiled. Setting optimizer capturable attribute to False.")
+        cfg.model.optimizer.capturable = False
+        log.info("Model will not be compiled. Enabling automatic optimization.")
+        cfg.model.automatic_optimization = True
+        
+
+    # set seed for random number generators in pytorch, numpy and python.random
+    if cfg.get("seed"):
+        L.seed_everything(cfg.seed, workers=True)
+
+    if cfg.get("time_domain"):
+        log.info(f"Instantiating time domain <{cfg.time_domain._target_}>")
+        td: TimeDomain = hydra.utils.instantiate(cfg.time_domain)
+
+    if cfg.get("spatial_domain"):
+        log.info(f"Instantiating spatial domain <{cfg.spatial_domain._target_}>")
+        sd: SpatialDomain = hydra.utils.instantiate(cfg.spatial_domain)
+
+    log.info(f"Instantiating mesh <{cfg.mesh._target_}>")
+    if cfg.mesh._target_ == 'pinnstorch.data.Mesh':
+        mesh: Mesh = hydra.utils.instantiate(cfg.mesh,
+                                             time_domain = td,
+                                             spatial_domain=sd,
+                                             read_data_fn = read_data_fn)
+    elif cfg.mesh._target_ == 'pinnstorch.data.PointCloud':
+        mesh: PointCloud = hydra.utils.instantiate(cfg.mesh,
+                                                   read_data_fn = read_data_fn)
+    else:
+        raise "Mesh should be defined in config file."
+        
+    train_datasets = []
+    for dataset_dic in cfg.train_datasets:
+        for i, (key, dataset) in enumerate(dataset_dic.items()):          
+            log.info(f"Instantiating training dataset number {i+1}: <{dataset._target_}>")
+            train_datasets.append(hydra.utils.instantiate(dataset)(mesh = mesh))
+
+    val_dataset = None
+    if cfg.get("val_dataset"):
+        for dataset_dic in cfg.val_dataset:
+            for i, (key, dataset) in enumerate(dataset_dic.items()):          
+                log.info(f"Instantiating validation dataset number {i+1}: <{dataset._target_}>")
+                val_dataset = hydra.utils.instantiate(dataset)(mesh = mesh)
+
+    test_dataset = None
+    if cfg.get("test_dataset"):
+        for dataset_dic in cfg.test_dataset:
+            for i, (key, dataset) in enumerate(dataset_dic.items()):          
+                log.info(f"Instantiating test dataset number {i+1}: <{dataset._target_}>")
+                test_dataset = hydra.utils.instantiate(dataset)(mesh = mesh)
+        
+
+    pred_dataset = None
+    if cfg.get("pred_dataset"):
+        for dataset_dic in cfg.pred_dataset:
+            for i, (key, dataset) in enumerate(dataset_dic.items()):          
+                log.info(f"Instantiating prediction dataset number {i+1}: <{dataset._target_}>")
+                pred_dataset = hydra.utils.instantiate(dataset)(mesh = mesh)
+                
+    log.info(f"Instantiating datamodule <{cfg.data._target_}>")
+    datamodule: LightningDataModule = hydra.utils.instantiate(cfg.data,
+                                                              train_datasets = train_datasets,
+                                                              val_dataset = val_dataset,
+                                                              test_dataset = test_dataset,
+                                                              pred_dataset = pred_dataset,
+                                                              batch_size = cfg.get("batch_size"))
+
+    
+    if cfg.net._target_ == 'pinnstorch.models.FCN':
+        log.info(f"Instantiating neural net <{cfg.net._target_}>")
+        net: torch.nn.Module = hydra.utils.instantiate(cfg.net)(lb=mesh.lb, ub=mesh.ub)
+    elif cfg.net._target_ == 'pinnstorch.models.NetHFM':
+        # TODO
+        log.info(f"Instantiating neural net <{cfg.net._target_}>")
+        net: torch.nn.Module = hydra.utils.instantiate(cfg.net)(mean = train_datasets[0].mean,
+                                                                std = train_datasets[0].std)
+    
+    
+    log.info(f"Instantiating model <{cfg.model._target_}>")
+
+    model: LightningModule = hydra.utils.instantiate(cfg.model)(net = net, pde_fn = pde_fn, output_fn = output_fn)
+    
+    log.info("Instantiating callbacks...")
+    callbacks: List[Callback] = utils.instantiate_callbacks(cfg.get("callbacks"))
+
+    log.info("Instantiating loggers...")
+    logger: List[Logger] = utils.instantiate_loggers(cfg.get("logger"))
+    
+    log.info(f"Instantiating trainer <{cfg.trainer._target_}>")
+    trainer: Trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=logger)
+    
+    object_dict = {
+        "cfg": cfg,
+        "datamodule": datamodule,
+        "model": model,
+        "callbacks": callbacks,
+        "logger": logger,
+        "trainer": trainer,
+    }
+    
+    if logger:
+        log.info("Logging hyperparameters!")
+        utils.log_hyperparameters(object_dict)
+        
+    if cfg.get("train"):
+        log.info("Starting training!")
+        trainer.fit(model=model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path"))
+
+    train_metrics = trainer.callback_metrics
+    if cfg.get("val"):
+        log.info("Starting validation!")
+        trainer.validate(model=model, datamodule=datamodule)
+        
+    if cfg.get("test"):
+        log.info("Starting testing!")
+        ckpt_path = None #trainer.checkpoint_callback.best_model_path
+        #if ckpt_path == "":
+        #    log.warning("Best ckpt not found! Using current weights for testing...")
+        #    ckpt_path = None
+        trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=logger)
+        trainer.test(model=model, datamodule=datamodule, ckpt_path=ckpt_path)
+        #log.info(f"Best ckpt path: {ckpt_path}")
+
+    test_metrics = trainer.callback_metrics
+
+    if cfg.get("plotting"):
+        log.info(f"Plotting the results")
+        preds_list = trainer.predict(model=model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path"))
+        preds_dict = {}
+        for preds in preds_list:
+            for sol_key, pred in preds.items():
+                if sol_key in preds_dict.keys():
+                    preds_dict[sol_key] = torch.cat((preds_dict[sol_key], pred), 0)
+                else:
+                    preds_dict[sol_key] = pred
+        hydra.utils.instantiate(cfg.plotting,
+                                mesh = mesh,
+                                preds = preds_dict,
+                                train_datasets=train_datasets,
+                                val_dataset = val_dataset,
+                                file_name=cfg.paths.output_dir)()
+    
+    # merge train and test metrics
+    metric_dict = {**train_metrics, **test_metrics}
+
+    return metric_dict, object_dict
+
+@hydra.main(version_base="1.3", config_path="../configs", config_name="train.yaml")
+def main(cfg: DictConfig) -> Optional[float]:
+    """Main entry point for training.
+
+    :param cfg: DictConfig configuration composed by Hydra.
+    :return: Optional[float] with optimized metric value.
+    """
+    # apply extra utilities
+    # (e.g. ask for tags if none are provided in cfg, print cfg tree, etc.)
+    utils.extras(cfg)
+
+    # train the model
+    metric_dict, _ = train(cfg)
+
+    # safely retrieve metric value for hydra-based hyperparameter optimization
+    metric_value = utils.get_metric_value(
+        metric_dict=metric_dict, metric_name=cfg.get("optimized_metric")
+    )
+
+    # return optimized metric
+    return metric_value
+
+
+if __name__ == "__main__":
+    main()
