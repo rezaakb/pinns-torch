@@ -232,7 +232,7 @@ class PINNModule(LightningModule):
         :param batch_idx: The index of the current batch.
         :return: A tensor of losses between model predictions and targets.
         """
-        
+
         if self.automatic_optimization:
             self.static_loss, pred = self.model_step(batch, batch_idx)
 

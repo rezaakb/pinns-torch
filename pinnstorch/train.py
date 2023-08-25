@@ -25,7 +25,7 @@ log = utils.get_pylogger(__name__)
 
 OmegaConf.register_new_resolver("eval", eval)
 
-    
+
 @utils.task_wrapper
 def train(
     cfg: DictConfig, read_data_fn: Callable, pde_fn: Callable, output_fn: Callable = None
@@ -39,7 +39,7 @@ def train(
     :param cfg: A DictConfig configuration composed by Hydra.
     :return: A tuple with metrics and dict with all instantiated objects.
     """
-    if cfg.compile and cfg.trainer.accelerator != 'cpu':
+    if cfg.compile and cfg.trainer.accelerator != "cpu":
         log.info("Model will be compiled. Setting optimizer capturable attribute to True.")
         cfg.model.optimizer.capturable = True
         log.info("Model will be compiled. Disabling automatic optimization.")
@@ -50,19 +50,18 @@ def train(
                     f"DDP is not supported for compiled model. Using device {cfg.trainer.devices[0]}"
                 )
                 cfg.trainer.devices = cfg.trainer.devices[0]
-    
-    elif not cfg.compile and cfg.trainer.accelerator != 'cpu':
+
+    elif not cfg.compile and cfg.trainer.accelerator != "cpu":
         log.info("Model will not be compiled. Setting optimizer capturable attribute to False.")
         cfg.model.optimizer.capturable = False
         log.info("Model will not be compiled. Enabling automatic optimization.")
         cfg.model.automatic_optimization = True
 
-    elif cfg.trainer.accelerator == 'cpu':
+    elif cfg.trainer.accelerator == "cpu":
         log.info("Model will not be compiled. Setting optimizer capturable attribute to False.")
         cfg.model.optimizer.capturable = False
         log.info("Model will not be compiled. Enabling automatic optimization.")
         cfg.model.automatic_optimization = True
-        
 
     # set seed for random number generators in pytorch, numpy and python.random
     if cfg.get("seed"):
