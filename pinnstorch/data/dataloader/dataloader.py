@@ -3,17 +3,6 @@ import torch
 
 class PINNDataLoader:
     """Custom DataLoader for the PINN datasets.
-
-    A `PINNDataLoader` implements 3 key methods:
-
-    ```python
-        def  __iter__(self):
-        # initializes the data loader iterator.
-
-        def __next__(self):
-        # generates the next batch of data.
-    ```
-
     This allows you to have a fast dataloader.
     """
 
