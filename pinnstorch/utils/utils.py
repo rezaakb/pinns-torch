@@ -145,7 +145,7 @@ def download_file(path, folder_name, filename):
     """
 
     url = f"https://storage.googleapis.com/pinns/{folder_name}/{filename}"
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
     if response.status_code == 200:
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "wb") as file:
