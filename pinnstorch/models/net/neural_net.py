@@ -10,7 +10,8 @@ class FCN(nn.Module):
 
     In this model, lower and upper bound will be used for normalization of input data
     """
-
+    output_names: List[str]
+    
     def __init__(self, layers, lb, ub, output_names, discrete: bool = False) -> None:
         """Initialize a `FCN` module.
 
@@ -18,6 +19,7 @@ class FCN(nn.Module):
         :param lb: Lower bound for the inputs.
         :param ub: Upper bound for the inputs.
         :param output_names: Names of outputs of net.
+        :param discrete: If the problem is discrete or not.
         """
         super().__init__()
 
@@ -64,15 +66,27 @@ class FCN(nn.Module):
 
         # Discrete Mode
         if self.discrete:
-            if len(spatial) == 1:
-                z = spatial[0]
+            if len(spatial) == 2:
+                x, y = spatial
+                z = torch.cat((x, y), 1)
+            elif len(spatial) == 3:
+                x, y, z = spatial
+                z = torch.cat((x, y, z), 1)
             else:
-                z = torch.cat((*spatial,), 1)
+                z = spatial[0]
             z = 2.0 * (z - self.lb[:-1]) / (self.ub[:-1] - self.lb[:-1]) - 1.0
 
         # Continuous Mode
         else:
-            z = torch.cat((*spatial, time), 1)
+            if len(spatial) == 1:
+                x = spatial[0]
+                z = torch.cat((x, time), 1)
+            elif len(spatial) == 2:
+                x, y = spatial
+                z = torch.cat((x, y, time), 1)
+            else:
+                x, y, z = spatial
+                z = torch.cat((x, y, z, time), 1)
             z = 2.0 * (z - self.lb) / (self.ub - self.lb) - 1.0
 
         z = self.model(z)
@@ -93,7 +107,8 @@ class NetHFM(nn.Module):
     In this model, mean and std will be used for normalization of input data. Also, weight
     normalization will be done.
     """
-
+    output_names: List[str]
+    
     def __init__(self, mean, std, layers: List, output_names: List):
         super().__init__()
         """Initialize a `NetHFM` module.
@@ -143,13 +158,19 @@ class NetHFM(nn.Module):
         :param time: Input tensor representing time.
         :return: A dictionary with output names as keys and corresponding output tensors as values.
         """
+        if len(spatial) == 1:
+            x = spatial[0]
+            H = torch.cat((x, time), 1)
+        elif len(spatial) == 2:
+            x, y = spatial
+            H = torch.cat((x, y, time), 1)
+        else:
+            x, y, z = spatial
+            H = torch.cat((x, y, z, time), 1)
+        
+        H = (H - self.X_mean) / self.X_std
 
-        H = (torch.cat((*spatial, time), 1) - self.X_mean) / self.X_std
-
-        for i in range(0, self.num_layers - 1):
-            W = self.weights[i]
-            b = self.biases[i]
-            g = self.gammas[i]
+        for i, (W, b, g) in enumerate(zip(self.weights, self.biases, self.gammas)):
             # weight normalization
             V = W / torch.norm(W, dim=0)
             # matrix multiplication
@@ -159,7 +180,6 @@ class NetHFM(nn.Module):
             # activation
             if i < self.num_layers - 2:
                 H = H * self.sigmoid(H)
-
         outputs_dict = {name: H[:, i : i + 1] for i, name in enumerate(self.output_names)}
 
         return outputs_dict

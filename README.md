@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="http://drive.google.com/uc?export=view&id=1JO83M12_y2F8h7QYZZSK5NXkRSdWnSqy" width="400">
+<img src="http://drive.google.com/uc?export=view&id=1Sqz8yYnij-7Vjl-4laOxBBCdhE0eDCDe" width="400">
 </br>
 </br>
 

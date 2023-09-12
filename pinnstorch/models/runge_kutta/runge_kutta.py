@@ -1,8 +1,8 @@
 import logging
-import os
+
+from typing import Dict, List, Union, Optional
 
 import numpy as np
-import requests
 import torch
 
 from pinnstorch.utils import load_data_txt
@@ -28,8 +28,6 @@ class RungeKutta(torch.nn.Module):
 
         dt = np.array(time_domain[t2] - time_domain[t1]).astype(np.float32)
 
-        # self.irk = {}
-        # self.irk['dt'] = torch.tensor(dt)
         self.register_buffer("dt", torch.from_numpy(dt))
 
         if q is None:
@@ -48,22 +46,18 @@ class RungeKutta(torch.nn.Module):
         tmp = load_data_txt(root_dir, file_name)
 
         weights = np.reshape(tmp[0 : q**2 + q], (q + 1, q)).astype(np.float32)
-        # self.irk['alpha'] = torch.tensor(weights[0:-1, :].T)
+        
         self.register_buffer("alpha", torch.from_numpy(weights[0:-1, :].T))
-        # self.irk['beta'] = torch.tensor(weights[-1:, :].T)
         self.register_buffer("beta", torch.from_numpy(weights[-1:, :].T))
-        # self.irk['weights'] = torch.tensor(weights.T)
         self.register_buffer("weights", torch.from_numpy(weights.T))
+        
         self.IRK_times = tmp[q**2 + q :]
 
-    def to(self, device) -> None:
-        """Move the internal tensors of the RungeKutta object to the specified device.
-
-        :param device: The target device.
-        """
-        self.irk = {key: tensor.to(device) for key, tensor in self.irk.items()}
-
-    def forward(self, outputs, mode, solution_names, collection_points_names):
+    def forward(self,
+                outputs: Dict[str, torch.Tensor],
+                mode: str,
+                solution_names: List[str],
+                collection_points_names: List[str]):
         """Perform a forward step using the Runge-Kutta method for solving differential equations.
 
         :param outputs: Dictionary containing solution tensors and other variables.

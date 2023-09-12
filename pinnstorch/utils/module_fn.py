@@ -1,7 +1,12 @@
+from typing import Dict, List, Union, Optional, Tuple
+
 import torch
 
-
-def sse(loss, preds, target=None, keys=None, mid=None):
+def sse(loss: torch.Tensor,
+        preds: Dict[str, torch.Tensor],
+        target: Union[Dict[str, torch.Tensor], None] = None,
+        keys: Union[List[str], None] = None,
+        mid: Union[int, None] = None) -> torch.Tensor:
     """Calculate the sum of squared errors (SSE) loss for given predictions and optional targets.
 
     :param loss: Loss variable.
@@ -11,21 +16,25 @@ def sse(loss, preds, target=None, keys=None, mid=None):
     :param mid: Index to separate predictions for mid-point calculation (optional).
     :return: Calculated SSE loss.
     """
+    
     if keys is None:
         return loss
 
     for key in keys:
         if target is None and mid is None:
             loss = loss + torch.sum(torch.square(preds[key]))
-        elif mid is not None:
+        elif target is None and mid is not None:
             loss = loss + torch.sum(torch.square(preds[key][:mid] - preds[key][mid:]))
-        else:
+        elif target is not None:
             loss = loss + torch.sum(torch.square(preds[key] - target[key]))
 
     return loss
 
-
-def mse(loss, preds, target=None, keys=None, mid=None):
+def mse(loss: torch.Tensor,
+        preds: Dict[str, torch.Tensor],
+        target: Union[Dict[str, torch.Tensor], None] = None,
+        keys: Union[List[str], None] = None,
+        mid: Union[int, None] = None) -> torch.Tensor:
     """Calculate the mean squared error (MSE) loss for given predictions and optional targets.
 
     :param loss: Loss variable.
@@ -35,15 +44,16 @@ def mse(loss, preds, target=None, keys=None, mid=None):
     :param mid: Index to separate predictions for mid-point calculation (optional).
     :return: Calculated MSE loss.
     """
+    
     if keys is None:
         return loss
 
     for key in keys:
-        if target is None:
+        if target is None and mid is None:
             loss = loss + torch.mean(torch.square(preds[key]))
-        elif mid is not None:
-            loss = loss + torch.sum(torch.square(preds[key][:mid] - preds[key][mid:]))
-        else:
+        elif target is None and mid is not None:
+            loss = loss + torch.mean(torch.square(preds[key][:mid] - preds[key][mid:]))
+        elif target is not None:
             loss = loss + torch.mean(torch.square(preds[key] - target[key]))
 
     return loss
@@ -94,3 +104,20 @@ def requires_grad(batch, enable_grad=True):
     }
 
     return spatial, time, solutions
+
+
+def set_requires_grad(x: List[torch.Tensor],
+                      t: torch.Tensor,
+                      enable_grad: bool=True) -> Tuple[List[torch.Tensor], torch.Tensor]:
+    """Set the requires_grad attribute for tensors in the input list.
+
+    :param x: List of tensors to modify requires_grad attribute.
+    :param t: Tensor to modify requires_grad attribute.
+    :param enable_grad: Boolean indicating whether to enable requires_grad or not.
+    :return: Modified list of tensors and tensor.
+    """
+    if t is not None:
+        t = t.requires_grad_(enable_grad)
+    x = [x_.requires_grad_(enable_grad) for x_ in x]
+
+    return x, t

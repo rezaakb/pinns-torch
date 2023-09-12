@@ -79,13 +79,14 @@ model:
 
 trainer:
   accelerator: gpu
-  max_epochs: 1000000
+  max_epochs: 100000
   devices: [0]
   deterministic: false
-  check_val_every_n_epoch: 1000
+  check_val_every_n_epoch: 100001
 
 train: true
 test: false
+val: true
 optimized_metric:
   error:
     - u

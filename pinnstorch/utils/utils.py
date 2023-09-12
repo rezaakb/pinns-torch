@@ -6,12 +6,11 @@ from typing import Any, Callable, Dict, Tuple
 import numpy as np
 import requests
 import scipy
-from omegaconf import DictConfig
+from omegaconf import DictConfig, open_dict
 
 from pinnstorch.utils import pylogger, rich_utils
 
 log = pylogger.get_pylogger(__name__)
-
 
 def extras(cfg: DictConfig) -> None:
     """Applies optional utilities before the task is started.
@@ -121,17 +120,17 @@ def get_metric_value(metric_dict: Dict[str, Any], metric_names: list) -> float:
 
             if not metric_name:
                 log.info("Metric name is None! Skipping metric value retrieval...")
-                return None
+                continue
 
             if metric_name not in metric_dict:
-                raise Exception(
+                log.info(
                     f"Metric value not found! <metric_name={metric_name}>\n"
                     "Make sure metric name logged in LightningModule is correct!\n"
                     "Make sure `optimized_metric` name in `hparams_search` config is correct!"
                 )
-
-            metric_value = metric_dict[metric_name].item()
-            log.info(f"Retrieved metric value! <{metric_name}={metric_value}>")
+            else:
+                metric_value = metric_dict[metric_name].item()
+                log.info(f"Retrieved metric value! <{metric_name}={metric_value}>")
 
     return metric_value
 
@@ -186,3 +185,41 @@ def load_data(root_path, file_name):
         download_file(path, "data", file_name)
 
     return scipy.io.loadmat(path)
+
+
+def set_mode(cfg):
+    import torch
+    torch.cuda.empty_cache()
+
+    if cfg.model.lazy:
+        log.info("Using LazyTensor as backend.")
+    
+    if cfg.model.cudagraph_compile and cfg.trainer.accelerator != "cpu":
+        log.info("Model will be compiled.")
+        log.info("Setting optimizer capturable attribute to True.")
+        cfg.model.optimizer.capturable = True
+        log.info("Disabling automatic optimization.")
+        if cfg.trainer.devices is not None:
+            if len(cfg.trainer.devices) > 1:
+                log.info(
+                    f"DDP is not supported for compiled model. Using device {cfg.trainer.devices[0]}"
+                )
+                cfg.trainer.devices = [cfg.trainer.devices[0]]
+        
+    elif not cfg.model.cudagraph_compile and cfg.trainer.accelerator != "cpu": 
+        log.info("Model will not be compiled.")
+        log.info("Setting optimizer capturable attribute to False.")
+        cfg.model.optimizer.capturable = False
+        log.info("Enabling automatic optimization.")
+        if cfg.model.amp:
+            with open_dict(cfg):
+                cfg.trainer.precision = 16
+
+    elif cfg.trainer.accelerator == "cpu":
+        log.info("Model will not be compiled.")
+        cfg.model.cudagraph_compile = False
+        log.info("Setting optimizer capturable attribute to False.")
+        cfg.model.optimizer.capturable = False
+        log.info("Enabling automatic optimization.")
+    
+    return cfg

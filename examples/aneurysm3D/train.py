@@ -38,8 +38,12 @@ def read_data_fn(root_path):
         solution={"u": U_star, "v": V_star, "w": W_star, "p": P_star, "c": C_star},
     )
 
-
-def pde_fn(outputs, x, y, z, t, extra_variables=None):
+def pde_fn(outputs: Dict[str, torch.Tensor],
+           x: torch.Tensor,
+           y: torch.Tensor,
+           z: torch.Tensor,
+           t: torch.Tensor,
+           extra_variables: Optional[Dict[str, torch.Tensor]]):   
     """Define the partial differential equations (PDEs).
 
     :param outputs: Dictionary containing the network outputs for different variables.
@@ -56,14 +60,11 @@ def pde_fn(outputs, x, y, z, t, extra_variables=None):
 
     Y = torch.cat([outputs["c"], outputs["u"], outputs["v"], outputs["w"], outputs["p"]], 1)
 
-    Y_t = pinnstorch.utils.fwd_gradient(Y, t)
-    Y_x = pinnstorch.utils.fwd_gradient(Y, x)
-    Y_y = pinnstorch.utils.fwd_gradient(Y, y)
-    Y_z = pinnstorch.utils.fwd_gradient(Y, z)
+    Y_t, Y_x, Y_y, Y_z = pinnstorch.utils.fwd_gradient(Y, [t, x, y, z])
 
-    Y_xx = pinnstorch.utils.fwd_gradient(Y_x, x)
-    Y_yy = pinnstorch.utils.fwd_gradient(Y_y, y)
-    Y_zz = pinnstorch.utils.fwd_gradient(Y_z, z)
+    Y_xx = pinnstorch.utils.fwd_gradient(Y_x, x, create_graph=False)[0]
+    Y_yy = pinnstorch.utils.fwd_gradient(Y_y, y, create_graph=False)[0]
+    Y_zz = pinnstorch.utils.fwd_gradient(Y_z, z, create_graph=False)[0]
 
     c, u, v, w, p = torch.split(Y, (1), dim=1)
 

@@ -21,13 +21,15 @@ def read_data_fn(root_path):
     return {"u": exact_u}
 
 
-def pde_fn(outputs, x, extra_variables):
-    """Define the partial differential equations (PDEs)."""
+def pde_fn(outputs: Dict[str, torch.Tensor],
+           x: torch.Tensor):
+    """Define the partial differential equations (PDEs).
+    """
 
     u = outputs["u"][:, :-1]
-    u_x = pinnstorch.utils.fwd_gradient(u, x)
-    u_xx = pinnstorch.utils.fwd_gradient(u_x, x)
-    outputs["f"] = 5.0 * u - 5.0 * u**3 + 0.0001 * u_xx
+    u_x = pinnstorch.utils.fwd_gradient(u, x)[0]
+    u_xx = pinnstorch.utils.fwd_gradient(u_x, x)[0]
+    outputs["f"] = 5.0 * u - 5.0 * (u**3) + 0.0001 * u_xx
     return outputs
 
 

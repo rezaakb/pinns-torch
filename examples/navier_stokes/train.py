@@ -2,7 +2,6 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import hydra
 import numpy as np
-import rootutils
 import torch
 from omegaconf import DictConfig
 
@@ -29,24 +28,32 @@ def read_data_fn(root_path):
     )
 
 
-def output_fn(outputs, x, y, t):
+def output_fn(outputs: Dict[str, torch.Tensor],
+              x: torch.Tensor,
+              y: torch.Tensor,
+              t: torch.Tensor):
     """Define `output_fn` function that will be applied to outputs of net."""
-    outputs["u"] = pinnstorch.utils.gradient(outputs["psi"], y)
-    outputs["v"] = -pinnstorch.utils.gradient(outputs["psi"], x)
+
+    outputs["u"] = pinnstorch.utils.gradient(outputs["psi"], y)[0]
+    outputs["v"] = -pinnstorch.utils.gradient(outputs["psi"], x)[0]
 
     return outputs
 
 
-def pde_fn(outputs, x, y, t, extra_variables):
+def pde_fn(outputs: Dict[str, torch.Tensor],
+           x: torch.Tensor,
+           y: torch.Tensor,
+           t: torch.Tensor,
+           extra_variables: Dict[str, torch.Tensor]):   
     """Define the partial differential equations (PDEs)."""
 
     u_x, u_y, u_t = pinnstorch.utils.gradient(outputs["u"], [x, y, t])
-    u_xx = pinnstorch.utils.gradient(u_x, x)
-    u_yy = pinnstorch.utils.gradient(u_y, y)
+    u_xx = pinnstorch.utils.gradient(u_x, x)[0]
+    u_yy = pinnstorch.utils.gradient(u_y, y)[0]
 
     v_x, v_y, v_t = pinnstorch.utils.gradient(outputs["v"], [x, y, t])
-    v_xx = pinnstorch.utils.gradient(v_x, x)
-    v_yy = pinnstorch.utils.gradient(v_y, y)
+    v_xx = pinnstorch.utils.gradient(v_x, x)[0]
+    v_yy = pinnstorch.utils.gradient(v_y, y)[0]
 
     p_x, p_y = pinnstorch.utils.gradient(outputs["p"], [x, y])
 

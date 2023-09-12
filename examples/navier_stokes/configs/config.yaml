@@ -57,9 +57,10 @@ trainer:
   max_epochs: 250000
   devices: [0]
   deterministic: false
-  check_val_every_n_epoch: 1000
+  check_val_every_n_epoch: 250001
 
 train: true
+val: true
 test: false
 optimized_metric:
   error:

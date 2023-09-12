@@ -24,7 +24,9 @@ def read_data_fn(root_path):
     return {"u": exact_u, "v": exact_v, "h": exact_h}
 
 
-def output_fn(outputs, x, t):
+def output_fn(outputs: Dict[str, torch.Tensor],
+              x: torch.Tensor,
+              t: torch.Tensor):
     """Define `output_fn` function that will be applied to outputs of net."""
 
     outputs["h"] = torch.sqrt(outputs["u"] ** 2 + outputs["v"] ** 2)
@@ -32,14 +34,15 @@ def output_fn(outputs, x, t):
     return outputs
 
 
-def pde_fn(outputs, x, t, extra_variables=None):
+def pde_fn(outputs: Dict[str, torch.Tensor],
+           x: torch.Tensor,
+           t: torch.Tensor):   
     """Define the partial differential equations (PDEs)."""
-
     u_x, u_t = pinnstorch.utils.gradient(outputs["u"], [x, t])
     v_x, v_t = pinnstorch.utils.gradient(outputs["v"], [x, t])
 
-    u_xx = pinnstorch.utils.gradient(u_x, x)
-    v_xx = pinnstorch.utils.gradient(v_x, x)
+    u_xx = pinnstorch.utils.gradient(u_x, x)[0]
+    v_xx = pinnstorch.utils.gradient(v_x, x)[0]
 
     outputs["f_u"] = u_t + 0.5 * v_xx + (outputs["u"] ** 2 + outputs["v"] ** 2) * outputs["v"]
     outputs["f_v"] = v_t - 0.5 * u_xx - (outputs["u"] ** 2 + outputs["v"] ** 2) * outputs["u"]

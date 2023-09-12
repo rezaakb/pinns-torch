@@ -1,9 +1,13 @@
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
+import os
+import time
 import hydra
 import lightning as L
 import rootutils
 import torch
+import numpy as np
+
 from lightning import Callback, LightningDataModule, LightningModule, Trainer
 from lightning.pytorch.loggers import Logger
 from omegaconf import DictConfig, OmegaConf
@@ -22,9 +26,7 @@ from pinnstorch.data import (
 
 log = utils.get_pylogger(__name__)
 
-
 OmegaConf.register_new_resolver("eval", eval)
-
 
 @utils.task_wrapper
 def train(
@@ -39,29 +41,8 @@ def train(
     :param cfg: A DictConfig configuration composed by Hydra.
     :return: A tuple with metrics and dict with all instantiated objects.
     """
-    if cfg.compile and cfg.trainer.accelerator != "cpu":
-        log.info("Model will be compiled. Setting optimizer capturable attribute to True.")
-        cfg.model.optimizer.capturable = True
-        log.info("Model will be compiled. Disabling automatic optimization.")
-        cfg.model.automatic_optimization = False
-        if isinstance(cfg.trainer.devices, list):
-            if len(cfg.trainer.devices) > 1:
-                log.info(
-                    f"DDP is not supported for compiled model. Using device {cfg.trainer.devices[0]}"
-                )
-                cfg.trainer.devices = cfg.trainer.devices[0]
 
-    elif not cfg.compile and cfg.trainer.accelerator != "cpu":
-        log.info("Model will not be compiled. Setting optimizer capturable attribute to False.")
-        cfg.model.optimizer.capturable = False
-        log.info("Model will not be compiled. Enabling automatic optimization.")
-        cfg.model.automatic_optimization = True
-
-    elif cfg.trainer.accelerator == "cpu":
-        log.info("Model will not be compiled. Setting optimizer capturable attribute to False.")
-        cfg.model.optimizer.capturable = False
-        log.info("Model will not be compiled. Enabling automatic optimization.")
-        cfg.model.automatic_optimization = True
+    cfg = utils.set_mode(cfg)
 
     # set seed for random number generators in pytorch, numpy and python.random
     if cfg.get("seed"):
@@ -139,7 +120,7 @@ def train(
     model: LightningModule = hydra.utils.instantiate(cfg.model)(
         net=net, pde_fn=pde_fn, output_fn=output_fn
     )
-
+    
     log.info("Instantiating callbacks...")
     callbacks: List[Callback] = utils.instantiate_callbacks(cfg.get("callbacks"))
 
@@ -164,22 +145,21 @@ def train(
 
     if cfg.get("train"):
         log.info("Starting training!")
+        start_time = time.time()
         trainer.fit(model=model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path"))
-
+        log.info(f"Elapsed time: {time.time() - start_time}")
+    log.info(f"MEAN time: {np.median(model.times[-5:])}  -   {np.median(model.times[-100:-10])} -  {np.median(model.times)}")
     train_metrics = trainer.callback_metrics
     if cfg.get("val"):
         log.info("Starting validation!")
+        model.amp = False
         trainer.validate(model=model, datamodule=datamodule)
 
     if cfg.get("test"):
         log.info("Starting testing!")
         ckpt_path = None  # trainer.checkpoint_callback.best_model_path
-        # if ckpt_path == "":
-        #    log.warning("Best ckpt not found! Using current weights for testing...")
-        #    ckpt_path = None
         trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=logger)
         trainer.test(model=model, datamodule=datamodule, ckpt_path=ckpt_path)
-        # log.info(f"Best ckpt path: {ckpt_path}")
 
     test_metrics = trainer.callback_metrics
 

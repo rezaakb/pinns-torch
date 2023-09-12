@@ -1,13 +1,18 @@
 _target_: pinnstorch.models.PINNModule
 _partial_: true
 loss_fn: sse
-automatic_optimization: False
+jit_compile: false
+amp: false
+lazy: false
+cudagraph_compile: true
 optimizer:
   _target_: torch.optim.Adam
   _partial_: true
   lr: 0.001
   weight_decay: 0.0
   capturable: true
+scaler:
+  _target_: torch.cuda.amp.GradScaler
 #scheduler:
 #  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
 #  _partial_: true

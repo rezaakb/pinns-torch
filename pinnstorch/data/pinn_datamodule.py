@@ -1,10 +1,7 @@
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, Callable
 
-import numpy as np
 import torch
 from lightning import LightningDataModule
-from lightning.pytorch.utilities.combined_loader import CombinedLoader
-from torch.utils.data import Dataset
 
 from .dataloader.dataloader import PINNDataLoader
 
@@ -48,7 +45,8 @@ class PINNDataModule(LightningDataModule):
     Read the docs:
         https://lightning.ai/docs/pytorch/latest/data/datamodule.html
     """
-
+    function_mapping: Dict[str, Callable]
+    
     def __init__(
         self,
         train_datasets,
@@ -59,7 +57,7 @@ class PINNDataModule(LightningDataModule):
         num_workers: int = 0,
         pin_memory: bool = False,
     ) -> None:
-        """Initialize a `MNISTDataModule`.
+        """Initialize a `PINNDataModule`.
 
         :param train_datasets: train datasets.
         :param val_dataset: validation dataset.
@@ -78,52 +76,18 @@ class PINNDataModule(LightningDataModule):
 
         # this line allows to access init params with 'self.hparams' attribute
         # also ensures init params will be stored in ckpt
-        self.save_hyperparameters(logger=False)
+        #self.save_hyperparameters(logger=False)
 
-        self.data_train: Optional[Dataset] = None
-        self.data_val: Optional[Dataset] = self.val_dataset
-        self.data_test: Optional[Dataset] = (
+        self.data_train = None
+        self.data_val = self.val_dataset
+        self.data_test = (
             self.test_dataset if self.test_dataset else self.val_dataset
         )
-        self.data_pred: Optional[Dataset] = (
+        self.data_pred = (
             self.pred_dataset if self.pred_dataset else self.val_dataset
         )
 
-    def setup_(self, stage: Optional[str] = None) -> None:
-        """Load data. Set variables: `self.data_train`, `self.data_val`, `self.data_test`.
-
-        This method is called by Lightning before `trainer.fit()`, `trainer.validate()`, `trainer.test()`, and
-        `trainer.predict()`, so be careful not to execute things like random split twice! Also, it is called after
-        `self.prepare_data()` and there is a barrier in between which ensures that all the processes proceed to
-        `self.setup()` once the data is prepared and available for use.
-
-        :param stage: The stage to setup. Either `"fit"`, `"validate"`, `"test"`, or `"predict"`. Defaults to ``None``.
-        """
-
-        # load and split datasets only if not loaded already
-        if not self.data_train:
-            self.data_train = {}
-            mesh_idx = self.find_discrete_mesh()
-            j = 0
-
-            for train_dataset in self.train_datasets:
-                name = type(train_dataset).__name__
-
-                # Add order of gradient to Periodic Boundary Condition
-                if name == "PeriodicBoundaryCondition":
-                    name = f"{name}_{train_dataset.derivative_order}"
-
-                # Add branch name to mesh sampler.
-                if name == "MeshSampler":
-                    if train_dataset.use_data and train_dataset.idx_t is None:
-                        name = f"{name}_{'use_data'}"
-                    else:
-                        name = f"{name}_{mesh_idx[j]}"
-                    j = j + 1
-
-                self.data_train[name] = PINNDataLoader(
-                    train_dataset, batch_size=len(train_dataset)
-                )
+        self.function_mapping = torch.jit.annotate(Dict[str, Callable], {})
 
     def setup(self, stage: Optional[str] = None) -> None:
         """Load data. Set variables: `self.data_train`, `self.data_val`, `self.data_test`.
@@ -142,9 +106,10 @@ class PINNDataModule(LightningDataModule):
             self.set_mode_for_discrete_mesh()
 
             for train_dataset in self.train_datasets:
-                self.data_train[train_dataset.loss_fn] = PINNDataLoader(
+                self.data_train[str(train_dataset.loss_fn)] = PINNDataLoader(
                     train_dataset, batch_size=self.batch_size, ignore=True, shuffle=True
                 )
+                self.function_mapping[str(train_dataset.loss_fn)] = train_dataset.loss_fn
 
     def set_mode_for_discrete_mesh(self):
         """This function will figuere out which training datasets are for discrete.
@@ -183,6 +148,7 @@ class PINNDataModule(LightningDataModule):
         """
 
         self.loss_fn = self.data_val.loss_fn
+        self.function_mapping[str(self.loss_fn)] = self.loss_fn
         self.solution_names = self.data_val.solution_names
 
         return PINNDataLoader(self.data_val, batch_size=self.batch_size, shuffle=False)
@@ -194,6 +160,7 @@ class PINNDataModule(LightningDataModule):
         :return: The test dataloader.
         """
         self.loss_fn = self.test_dataset.loss_fn if self.test_dataset else self.val_dataset.loss_fn
+        self.function_mapping[str(self.loss_fn)] = self.loss_fn
         self.solution_names = (
             self.test_dataset.solution_names
             if self.test_dataset
@@ -209,6 +176,7 @@ class PINNDataModule(LightningDataModule):
         :return: The test dataloader.
         """
         self.loss_fn = self.pred_dataset.loss_fn if self.pred_dataset else self.val_dataset.loss_fn
+        self.function_mapping[str(self.loss_fn)] = self.loss_fn
         self.solution_names = (
             self.pred_dataset.solution_names
             if self.pred_dataset
@@ -240,6 +208,7 @@ class PINNDataModule(LightningDataModule):
         :param state_dict: The datamodule state returned by `self.state_dict()`.
         """
         pass
+        
 
 
 if __name__ == "__main__":

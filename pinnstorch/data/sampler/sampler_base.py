@@ -1,9 +1,9 @@
+from typing import Tuple, List
+
 import numpy as np
 import torch
-from torch.utils.data import Dataset
 
-
-class SamplerBase(Dataset):
+class SamplerBase:
     """Other classes will be used this helper class."""
 
     def __init__(self):
@@ -15,6 +15,7 @@ class SamplerBase(Dataset):
         self.spatial_domain_sampled = None
         self.solution_sampled = None
         self.solution_names = None
+        self.zeros_tensor = torch.tensor(0.0, dtype=torch.float32)
 
     def concatenate_solutions(self, flatten_mesh):
         """Concatenate dictionary of sampled solution data.
@@ -68,19 +69,6 @@ class SamplerBase(Dataset):
 
         pass
 
-    def requires_grad(self, x, t, enable_grad=True):
-        """Set the requires_grad attribute for tensors in the input list.
-
-        :param x: List of tensors to modify requires_grad attribute.
-        :param t: Tensor to modify requires_grad attribute.
-        :param enable_grad: Boolean indicating whether to enable requires_grad or not.
-        :return: Modified list of tensors and tensor.
-        """
-        if t is not None:
-            t = t.requires_grad_(enable_grad)
-        x = [x_.requires_grad_(enable_grad) for x_ in x]
-
-        return x, t
 
     @property
     def mean(self):
@@ -125,11 +113,11 @@ class SamplerBase(Dataset):
 
         spatial_domain = [spatial_domain[idx] for spatial_domain in self.spatial_domain_sampled]
 
-        time_domain = None
+        time_domain = self.zeros_tensor
         if self.time_domain_sampled is not None:
             time_domain = self.time_domain_sampled[idx]
 
-        solution_domain = None
+        solution_domain = {'///': self.zeros_tensor}
         if self.solution_sampled is not None:
             solution_domain = {
                 solution_name: self.solution_sampled[i][idx]

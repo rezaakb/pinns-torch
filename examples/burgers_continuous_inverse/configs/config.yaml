@@ -44,10 +44,10 @@ net:
 
 trainer:
   accelerator: gpu
-  max_epochs: 20000
+  max_epochs: 40000
   devices: [0]
   deterministic: false
-  check_val_every_n_epoch: 1000
+  check_val_every_n_epoch: 40001
 
 model:
   loss_fn: mse
@@ -56,6 +56,7 @@ model:
     l2: -6.0
 
 train: true
+val: true
 test: false
 optimized_metric:
   error:

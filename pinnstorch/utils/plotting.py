@@ -602,7 +602,7 @@ def plot_burgers_continuous_forward(mesh, preds, train_datasets, val_dataset, fi
     savefig(file_name + "/fig")
 
 
-def plot_burgers_continuous_inverse(mesh, preds, train_datasets, val_datasets, file_name):
+def plot_burgers_continuous_inverse(mesh, preds, train_datasets, val_dataset, file_name):
     """Plot burgers continuous inverse PDE."""
 
     U_pred = preds["u"]
