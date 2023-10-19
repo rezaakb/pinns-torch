@@ -180,6 +180,80 @@ class NetHFM(nn.Module):
             # activation
             if i < self.num_layers - 2:
                 H = H * self.sigmoid(H)
+        
+        outputs_dict = {name: H[:, i : i + 1] for i, name in enumerate(self.output_names)}
+
+        return outputs_dict
+
+class NetHFM__(nn.Module):
+    """A simple fully-connected neural net for solving equations.
+
+    In this model, mean and std will be used for normalization of input data. Also, weight
+    normalization will be done.
+    """
+    output_names: List[str]
+    
+    def __init__(self, mean, std, layers: List, output_names: List):
+        super().__init__()
+        """Initialize a `NetHFM` module.
+
+        :param mesh: The number of layers.
+        :param layers: The list indicating number of neurons in each layer.
+        :param output_names: Names of outputs of net.
+        """
+        self.num_layers = len(layers)
+        self.output_names = output_names
+
+        self.register_buffer("X_mean", torch.from_numpy(mean))
+        self.register_buffer("X_std", torch.from_numpy(std))
+
+        self.initalize_net(layers)
+        self.sigmoid = nn.Sigmoid()
+
+    def initalize_net(self, layers: List) -> None:
+        """Initialize the neural network weights, biases, and gammas.
+
+        :param layers: The list indicating number of neurons in each layer.
+        """
+
+        self.layers = []
+        self.gammas = nn.ParameterList()
+        for i in range(self.num_layers - 1):
+            linear_layer = nn.Linear(layers[i], layers[i+1])
+            #self.layers.append(nn.utils.weight_norm(linear_layer))
+            self.layers.append(linear_layer)
+            gamma = nn.Parameter(torch.ones(layers[i+1]))
+            self.gammas.append(gamma)
+        self.layers = nn.ModuleList(self.layers)
+        
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, spatial: List[torch.Tensor], time: torch.Tensor) -> Dict[str, torch.Tensor]:
+        """Perform a forward pass through the network.
+
+        :param spatial: List of input spatial tensors.
+        :param time: Input tensor representing time.
+        :return: A dictionary with output names as keys and corresponding output tensors as values.
+        """
+        
+        if len(spatial) == 1:
+            x = spatial[0]
+            H = torch.cat((x, time), 1)
+        elif len(spatial) == 2:
+            x, y = spatial
+            H = torch.cat((x, y, time), 1)
+        else:
+            x, y, z = spatial
+            H = torch.cat((x, y, z, time), 1)
+        
+        H = (H - self.X_mean) / self.X_std
+
+        for i, (layer, gamma) in enumerate(zip(self.layers, self.gammas)):
+            H = layer(H)
+            H = gamma * H
+            if i < self.num_layers - 2:
+                H = H * self.sigmoid(H)
+                
         outputs_dict = {name: H[:, i : i + 1] for i, name in enumerate(self.output_names)}
 
         return outputs_dict

@@ -58,7 +58,7 @@ class InitialCondition(SamplerBase):
                 (flatten_mesh[0][idx, :], flatten_mesh[1][idx, :], flatten_mesh[2][idx, :])
             )
 
-    def loss_fn(self, inputs, loss, functions):
+    def _loss_fn(self, inputs, loss):
         """Compute the loss function based on inputs and functions.
 
         :param inputs: Input data for computing the loss.
@@ -68,9 +68,8 @@ class InitialCondition(SamplerBase):
         """
 
         x, t, u = inputs
-        x, t = set_requires_grad(x, t, True)
 
-        outputs = functions["forward"](x, t)
-        loss = functions["loss_fn"](loss, outputs, u, keys=self.solution_names)
+        outputs = self.functions["forward"](x, t)
+        loss = self.functions["loss_fn"](loss, outputs, u, keys=self.solution_names)
 
         return loss, outputs

@@ -152,6 +152,7 @@ class Mesh(MeshBase):
 
         self.spatial_dim = self.spatial_domain_mesh.shape[-1]
 
+        # We utilize the user-defined lower and upper bounds if they are specified.
         if ub is None and lb is None:
             self.lb, self.ub = self.domain_bounds()
         else:
@@ -177,7 +178,7 @@ class PointCloud(MeshBase):
             data.time,
             data.solution,
         )
-
+        print(self.solution['c'].shape)
         if not isinstance(self.solution, dict):
             raise "Solution outputs of read_data_fn function is not dictionary."
 
@@ -204,6 +205,7 @@ class PointCloud(MeshBase):
 
         self.time_domain_mesh = np.tile(self.time_domain, (1, spatial_num_points)).T[:, :, None]
 
+        # We utilize the user-defined lower and upper bounds if they are specified.
         if ub is None and lb is None:
             self.lb, self.ub = self.domain_bounds()
         else:

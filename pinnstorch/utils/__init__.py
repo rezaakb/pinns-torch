@@ -22,3 +22,5 @@ from pinnstorch.utils.utils import (
     task_wrapper,
     set_mode
 )
+
+from pinnstorch.utils.jit_compiler import jit_compiler

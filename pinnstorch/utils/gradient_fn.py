@@ -1,8 +1,9 @@
 from typing import Dict, List, Union, Optional, Tuple
 
 import torch 
+import torch._dynamo
 
-#@torch.jit.script
+@torch.jit.script
 def gradient(dy: torch.Tensor,
              dx: Union[List[torch.Tensor], torch.Tensor],
              ones_like_tensor: Optional[List[Optional[torch.Tensor]]] = None,
@@ -35,7 +36,7 @@ def gradient(dy: torch.Tensor,
     grads = [grad if grad is not None else torch.zeros_like(dx[i]) for i, grad in enumerate(dy_dx)]
     return grads
 
-#@torch.jit.script
+@torch.jit.script
 def fwd_gradient(dy: torch.Tensor, 
                  dx: Union[List[torch.Tensor], torch.Tensor],
                  create_graph: bool = True) -> List[torch.Tensor]:

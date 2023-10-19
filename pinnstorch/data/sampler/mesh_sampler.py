@@ -2,6 +2,7 @@ from typing import Dict, List, Any, Tuple, Callable
 
 import numpy as np
 import torch
+import torch._dynamo
 
 from .sampler_base import SamplerBase
 from pinnstorch.utils import set_requires_grad
@@ -24,7 +25,7 @@ class MeshSampler(SamplerBase):
         :param idx_t: Index of the time step.
         :param num_sample: Number of samples to generate.
         :param solution: Names of the solution outputs.
-        :param collection_points: Collection points mode.
+        :param collection_points: Names of the collection points.
         :param use_lhs: Whether use lhs or not for generating collection points.
         """
 
@@ -33,7 +34,6 @@ class MeshSampler(SamplerBase):
         self.solution_names = solution
         self.collection_points_names = collection_points
         self.idx_t = idx_t
-        self.ii = 0
         
         # On a time step.
         if self.idx_t:
@@ -61,33 +61,32 @@ class MeshSampler(SamplerBase):
             self.solution_sampled = None
 
         self.spatial_domain_sampled = list(torch.split(self.spatial_domain_sampled, (1), dim=1))
-
-    def loss_fn(self, inputs, loss, functions) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
+    
+    def _loss_fn(self,
+                 inputs,
+                 loss) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
         """Compute the loss function based on inputs and functions.
 
         :param inputs: Input data for computing the loss.
         :param loss: Loss variable.
-        :param functions: Additional functions required for loss computation.
         :return: Loss variable and outputs dict from the forward pass.
         """
-
         x, t, u = inputs
-        #x, t = set_requires_grad(x, t, True)
         
-        outputs = functions["forward"](x, t)
+        outputs = self.functions["forward"](x, t)
 
         if self.collection_points_names:
-            if functions["extra_variables"]:
-                outputs = functions["pde_fn"](outputs, *x, t, functions["extra_variables"])
+            if self.functions["extra_variables"] is not None:
+                outputs = self.functions["pde_fn"](outputs, *x, t, self.functions["extra_variables"])
             else:    
-                outputs = functions["pde_fn"](outputs, *x, t)
+                outputs = self.functions["pde_fn"](outputs, *x, t)
 
-        loss = functions["loss_fn"](loss, outputs, keys=self.collection_points_names) + \
-               functions["loss_fn"](loss, outputs, u, keys=self.solution_names)
+        loss = self.functions["loss_fn"](loss, outputs, keys=self.collection_points_names) + \
+               self.functions["loss_fn"](loss, outputs, u, keys=self.solution_names)
 
         return loss, outputs
-
-
+    
+ 
 class DiscreteMeshSampler(SamplerBase):
     """Sample from Mesh for discrete mode."""
 
@@ -105,7 +104,7 @@ class DiscreteMeshSampler(SamplerBase):
         :param idx_t: Index of the time step for discrete mode.
         :param num_sample: Number of samples to generate.
         :param solution: Names of the solution outputs.
-        :param collection_points: Collection points mode.
+        :param collection_points: Names of the collection points.
         """
         super().__init__()
 
@@ -142,33 +141,31 @@ class DiscreteMeshSampler(SamplerBase):
         """
         self._mode = value
 
-    def loss_fn(self, inputs, loss, functions):
+    def _loss_fn(self, inputs, loss):
         """Compute the loss function based on inputs and functions. _mode is assigned in
         PINNDataModule class. It can be `inverse_discrete_1`, `inverse_discrete_2`, or
-        `forward_discrete`
+        `forward_discrete`.
 
         :param inputs: Input data for computing the loss.
         :param loss: Loss variable.
-        :param functions: Additional functions required for loss computation.
         :return: Loss variable and outputs dict from the forward pass.
         """
 
         x, t, u = inputs
-        x, t = set_requires_grad(x, t, True)
 
-        outputs = functions["forward"](x, t)
+        outputs = self.functions["forward"](x, t)
 
         if self._mode:
-            if functions["extra_variables"]:
-                outputs = functions["pde_fn"](outputs, *x, functions["extra_variables"])
+            if self.functions["extra_variables"] is not None:
+                outputs = self.functions["pde_fn"](outputs, *x, self.functions["extra_variables"])
             else:
-                outputs = functions["pde_fn"](outputs, *x)
-            outputs = functions["runge_kutta"](
+                outputs = self.functions["pde_fn"](outputs, *x)
+            outputs = self.functions["runge_kutta"](
                 outputs,
                 mode=self._mode,
                 solution_names=self.solution_names,
                 collection_points_names=self.collection_points_names,
             )
-        loss = functions["loss_fn"](loss, outputs, u, keys=self.solution_names)
+        loss = self.functions["loss_fn"](loss, outputs, u, keys=self.solution_names)
 
         return loss, outputs

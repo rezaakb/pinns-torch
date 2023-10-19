@@ -44,7 +44,7 @@ def mse(loss: torch.Tensor,
     :param mid: Index to separate predictions for mid-point calculation (optional).
     :return: Calculated MSE loss.
     """
-    
+
     if keys is None:
         return loss
 
@@ -66,7 +66,12 @@ def relative_l2_error(preds, target):
     :param target: Target tensors.
     :return: Relative L2 error value.
     """
-    return torch.norm(preds - target, p=2) / torch.norm(target, p=2)
+    l2_norm_error = torch.mean((preds - target)**2)
+    l2_norm_target = torch.mean((target)**2)
+    #print(l2_norm_error, l2_norm_target, relative_l2)
+    if l2_norm_target == 0:
+        return l2_norm_error
+    return torch.sqrt(l2_norm_error/l2_norm_target)
 
 
 def fix_extra_variables(extra_variables):

@@ -146,10 +146,13 @@ def train(
     if cfg.get("train"):
         log.info("Starting training!")
         start_time = time.time()
-        trainer.fit(model=model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path"))
+        trainer.fit(model=model, datamodule=datamodule)
         log.info(f"Elapsed time: {time.time() - start_time}")
-    log.info(f"MEAN time: {np.median(model.times[-5:])}  -   {np.median(model.times[-100:-10])} -  {np.median(model.times)}")
+    
+    log.info(f"Median time for each batch: {np.median(model.times)}")
+    
     train_metrics = trainer.callback_metrics
+    
     if cfg.get("val"):
         log.info("Starting validation!")
         model.amp = False
@@ -158,7 +161,6 @@ def train(
     if cfg.get("test"):
         log.info("Starting testing!")
         ckpt_path = None  # trainer.checkpoint_callback.best_model_path
-        trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=logger)
         trainer.test(model=model, datamodule=datamodule, ckpt_path=ckpt_path)
 
     test_metrics = trainer.callback_metrics
@@ -190,7 +192,7 @@ def train(
     return metric_dict, object_dict
 
 
-@hydra.main(version_base="1.3", config_path="../configs", config_name="train.yaml")
+@hydra.main(version_base="1.3", config_path="configs", config_name="train.yaml")
 def main(cfg: DictConfig) -> Optional[float]:
     """Main entry point for training.
 

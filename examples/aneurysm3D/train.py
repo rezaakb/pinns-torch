@@ -42,8 +42,7 @@ def pde_fn(outputs: Dict[str, torch.Tensor],
            x: torch.Tensor,
            y: torch.Tensor,
            z: torch.Tensor,
-           t: torch.Tensor,
-           extra_variables: Optional[Dict[str, torch.Tensor]]):   
+           t: torch.Tensor):   
     """Define the partial differential equations (PDEs).
 
     :param outputs: Dictionary containing the network outputs for different variables.
@@ -62,9 +61,9 @@ def pde_fn(outputs: Dict[str, torch.Tensor],
 
     Y_t, Y_x, Y_y, Y_z = pinnstorch.utils.fwd_gradient(Y, [t, x, y, z])
 
-    Y_xx = pinnstorch.utils.fwd_gradient(Y_x, x, create_graph=False)[0]
-    Y_yy = pinnstorch.utils.fwd_gradient(Y_y, y, create_graph=False)[0]
-    Y_zz = pinnstorch.utils.fwd_gradient(Y_z, z, create_graph=False)[0]
+    Y_xx = pinnstorch.utils.fwd_gradient(Y_x, x)[0]
+    Y_yy = pinnstorch.utils.fwd_gradient(Y_y, y)[0]
+    Y_zz = pinnstorch.utils.fwd_gradient(Y_z, z)[0]
 
     c, u, v, w, p = torch.split(Y, (1), dim=1)
 

@@ -95,25 +95,23 @@ class DirichletBoundaryCondition(SamplerBase):
                 (flatten_mesh[0][idx, :], flatten_mesh[1][idx, :], flatten_mesh[2][idx, :])
             )
 
-    def loss_fn(self, inputs, loss, functions):
+    def _loss_fn(self, inputs, loss):
         """Compute the loss function based on inputs and functions.
 
         :param inputs: Input data for computing the loss.
         :param loss: Loss variable.
-        :param functions: Additional functions required for loss computation.
         :return: Loss variable and outputs dict from the forward pass.
         """
 
         x, t, u = inputs
-        x, t = set_requires_grad(x, t, True)
 
         # In discrete mode, we do not use time.
         if self.discrete:
             t = None
 
-        outputs = functions["forward"](x, t)
+        outputs = self.functions["forward"](x, t)
 
-        loss = functions["loss_fn"](loss, outputs, u, keys=self.solution_names)
+        loss = self.functions["loss_fn"](loss, outputs, u, keys=self.solution_names)
 
         return loss, outputs
 
@@ -125,8 +123,8 @@ class PeriodicBoundaryCondition(SamplerBase):
         self,
         mesh,
         solution,
-        idx_t: int = None,
         num_sample: int = None,
+        idx_t: int = None,
         derivative_order: int = 0,
         discrete: bool = False,
     ):
@@ -138,7 +136,7 @@ class PeriodicBoundaryCondition(SamplerBase):
         :param solution: Names of the solution outputs.
         :param num_sample: Number of samples to generate.
         :param idx_t: Index of the time step for discrete mode.
-        :param boundary_fun: A function can apply on boundary data.
+        :param derivative_order: Order of derivative.
         :param discrete: It is a boolean that is true when problem is discrete.
         """
 
@@ -188,32 +186,30 @@ class PeriodicBoundaryCondition(SamplerBase):
                 )
             )
     
-    def loss_fn(self, inputs, loss, functions):
+    def _loss_fn(self, inputs, loss):
         """Compute the loss function based on inputs and functions.
 
         :param inputs: Input data for computing the loss.
         :param loss: Loss variable.
-        :param functions: Additional functions required for loss computation.
         :return: Loss variable and outputs dict from the forward pass.
         """
 
         x, t, u = inputs
-        x, t = set_requires_grad(x, t, True)
 
         # In discrete mode, we do not use time.
         if self.discrete:
             t = None
 
-        outputs = functions["forward"](x, t)
-
+        outputs = self.functions["forward"](x, t)
+        
         if self.derivative_order == 1:
             for solution_name in self.solution_names:
                 if self.discrete:
                     outputs["tmp"] = utils.fwd_gradient(outputs[solution_name], x)[0]
                 else:
                     outputs["tmp"] = utils.gradient(outputs[solution_name], x)[0]
-                loss = functions["loss_fn"](loss, outputs, keys=["tmp"], mid=self.mid)
+                loss = self.functions["loss_fn"](loss, outputs, keys=["tmp"], mid=self.mid)
 
-        loss = functions["loss_fn"](loss, outputs, keys=self.solution_names, mid=self.mid)
+        loss = self.functions["loss_fn"](loss, outputs, keys=self.solution_names, mid=self.mid)
 
         return loss, outputs

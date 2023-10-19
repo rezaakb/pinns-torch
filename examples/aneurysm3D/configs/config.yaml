@@ -2,7 +2,7 @@ defaults:
   - ../../../configs/train
   - _self_
 
-batch_size: 512
+batch_size: 10000
 
 mesh:
   _target_: pinnstorch.data.PointCloud
@@ -65,12 +65,14 @@ model:
 
 trainer:
   accelerator: gpu
-  max_epochs: 200
+  max_epochs: 1
+  max_steps: 500
   devices: [0]
   deterministic: false
   check_val_every_n_epoch: 10
 
 train: true
+val: true
 test: false
 
 optimized_metric:

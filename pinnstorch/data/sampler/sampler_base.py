@@ -1,10 +1,12 @@
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 
 import numpy as np
 import torch
 
+from pinnstorch.utils import jit_compiler
+
 class SamplerBase:
-    """Other classes will be used this helper class."""
+    """Other samplers will be used this helper class."""
 
     def __init__(self):
         """Base class for sampling mesh data for training.
@@ -15,7 +17,9 @@ class SamplerBase:
         self.spatial_domain_sampled = None
         self.solution_sampled = None
         self.solution_names = None
+        self.first_batch = True
         self.zeros_tensor = torch.tensor(0.0, dtype=torch.float32)
+        
 
     def concatenate_solutions(self, flatten_mesh):
         """Concatenate dictionary of sampled solution data.
@@ -59,16 +63,26 @@ class SamplerBase:
 
         return [torch.from_numpy(array.astype(np.float32)) for array in arrays]
 
-    def loss_fn(self, inputs, loss, **functions):
-        """Compute the loss function based on given inputs and functions.
+    def loss_fn(self, inputs, loss, functions) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
+        """Compute the loss function based on inputs and functions.
 
         :param inputs: Input data for computing the loss.
         :param loss: Loss variable.
         :param functions: Additional functions required for loss computation.
+        :return: Loss variable and outputs dict from the forward pass.
         """
+        
+        self.functions = functions
+        if self.first_batch and self.functions["jit_compile"] and not self.functions["val"]:
+            if self.functions["batch_size"]:
+                self.functions["pde_fn"] = torch.jit.script(self.functions["pde_fn"])
+            else:
+                self._loss_fn = torch.compile(self._loss_fn, backend=jit_compiler)
+            self.first_batch = False
 
-        pass
+        loss, outputs = self._loss_fn(inputs, loss)
 
+        return loss, outputs
 
     @property
     def mean(self):

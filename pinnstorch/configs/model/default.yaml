@@ -5,6 +5,7 @@ jit_compile: false
 amp: false
 lazy: false
 cudagraph_compile: true
+inline: false
 optimizer:
   _target_: torch.optim.Adam
   _partial_: true
