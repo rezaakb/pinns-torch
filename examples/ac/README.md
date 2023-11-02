@@ -16,7 +16,7 @@ where $u^n$ is data at time $t^n$. We extract data from the exact solution at $t
 | Discrete Forward AC Equation | |
 |------------------------------|---|
 | PDE equations | $f^{n+c_j} = 5.0 u^{n+c_j} - 5.0 (u^{n+c_j})^3 + 0.0001 u^{n+c_j}_{xx}$ |
-| Periodic boundary conditions | $ u(t,-1) = u(t, 1), u_{x}(t,-1) = u_{x}(t, 1)$ |
+| Periodic boundary conditions | $u(t,-1) = u(t, 1), u_{x}(t,-1) = u_{x}(t, 1)$ |
 | The output of net | $[u^n_1(x),\dots, u^n_q(x), u^n_{q+1}(x)]$ |
 | Layers of net | $[1] + 4 * [200] + [101]$ |
 | The number of stages (q) | $100$ |
