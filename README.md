@@ -28,7 +28,7 @@ top. The logarithmic x-axis denotes the speed-up factor w.r.t the original code 
 
 For more information, please refer to our paper:
 
-<a href="">PINNs-Torch: Enhancing Speed and Usability of Physics-Informed Neural Networks with PyTorch.</a> Reza Akbarian Bafghi, and Maziar Raissi. DLDE III, NeurIPS, 2023.
+<a href="https://openreview.net/forum?id=nl1ZzdHpab">PINNs-Torch: Enhancing Speed and Usability of Physics-Informed Neural Networks with PyTorch.</a> Reza Akbarian Bafghi, and Maziar Raissi. DLDE III, NeurIPS, 2023.
 
 ## Installation
 
