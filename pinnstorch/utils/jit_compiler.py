@@ -1,3 +1,7 @@
+from typing import Tuple, List, Dict
+
+import torch
+
 from torch.utils._python_dispatch import _disable_current_modes
 from torch._subclasses.fake_tensor import FakeTensor
 

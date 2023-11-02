@@ -24,6 +24,9 @@ from pinnstorch.data import (
     TimeDomain,
 )
 
+from torch.profiler import profile, record_function, ProfilerActivity
+
+
 log = utils.get_pylogger(__name__)
 
 OmegaConf.register_new_resolver("eval", eval)
@@ -47,7 +50,7 @@ def train(
     # set seed for random number generators in pytorch, numpy and python.random
     if cfg.get("seed"):
         L.seed_everything(cfg.seed, workers=True)
-
+    
     if cfg.get("time_domain"):
         log.info(f"Instantiating time domain <{cfg.time_domain._target_}>")
         td: TimeDomain = hydra.utils.instantiate(cfg.time_domain)
@@ -128,8 +131,9 @@ def train(
     logger: List[Logger] = utils.instantiate_loggers(cfg.get("logger"))
 
     log.info(f"Instantiating trainer <{cfg.trainer._target_}>")
-    trainer: Trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=logger)
 
+    trainer: Trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=logger)
+    
     object_dict = {
         "cfg": cfg,
         "datamodule": datamodule,
@@ -148,7 +152,7 @@ def train(
         start_time = time.time()
         trainer.fit(model=model, datamodule=datamodule)
         log.info(f"Elapsed time: {time.time() - start_time}")
-    
+
     log.info(f"Median time for each batch: {np.median(model.times)}")
     
     train_metrics = trainer.callback_metrics
@@ -174,9 +178,9 @@ def train(
         for preds in preds_list:
             for sol_key, pred in preds.items():
                 if sol_key in preds_dict.keys():
-                    preds_dict[sol_key] = torch.cat((preds_dict[sol_key], pred), 0)
+                    preds_dict[sol_key] = torch.cat((preds_dict[sol_key], pred.detach()), 0)
                 else:
-                    preds_dict[sol_key] = pred
+                    preds_dict[sol_key] = pred.detach()
         hydra.utils.instantiate(
             cfg.plotting,
             mesh=mesh,

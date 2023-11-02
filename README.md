@@ -85,5 +85,11 @@ We employed [this template](https://github.com/ashleve/lightning-hydra-template)
 ## Citation
 
 ```
-...
-```
+@inproceedings{
+bafghi2023pinnstorch,
+title={{PINN}s-Torch: Enhancing Speed and Usability of Physics-Informed Neural Networks with PyTorch},
+author={Reza Akbarian Bafghi and Maziar Raissi},
+booktitle={The Symbiosis of Deep Learning and Differential Equations III},
+year={2023},
+url={https://openreview.net/forum?id=nl1ZzdHpab}
+}```

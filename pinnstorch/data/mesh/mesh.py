@@ -178,7 +178,7 @@ class PointCloud(MeshBase):
             data.time,
             data.solution,
         )
-        print(self.solution['c'].shape)
+
         if not isinstance(self.solution, dict):
             raise "Solution outputs of read_data_fn function is not dictionary."
 

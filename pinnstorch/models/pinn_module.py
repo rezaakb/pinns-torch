@@ -109,7 +109,7 @@ class PINNModule(LightningModule):
         if self.cudagraph_compile:
             self.automatic_optimization = False
             
-        if self.jit_compile:
+        if self.jit_compile and self.cudagraph_compile:
             if inline:
                 torch._C._debug_set_autodiff_subgraph_inlining(False)
                 torch._C._jit_set_nvfuser_single_node_mode(True)
@@ -364,7 +364,6 @@ class PINNModule(LightningModule):
             x, t, u = data
             x, t = set_requires_grad(x, t, True)
             loss, preds = self.function_mapping[loss_fn](data, loss, self.functions)
-        
         return loss, preds
         
 
@@ -390,9 +389,7 @@ class PINNModule(LightningModule):
             if batch_idx == 0 and not self.capture_end:
                 self.capture_graph(batch)
             else:
-                
                 self.g.replay()
-                
                 if self.amp:
                     self.scaler.step(self.opt)
                     self.scaler.update()
@@ -402,7 +399,8 @@ class PINNModule(LightningModule):
             self.log("train/loss", self.train_loss, on_step=False, on_epoch=True, prog_bar=True, sync_dist=False)
 
         else:
-            loss, pred = self.model_step(batch)
+                
+            loss, pred = self.model_step(batch)            
             
             # update and log metrics    
             self.train_loss(loss)

@@ -189,7 +189,11 @@ def load_data(root_path, file_name):
 
 def set_mode(cfg):
     import torch
-    torch.cuda.empty_cache()
+    
+    if not torch.cuda.is_available():
+        log.info("GPU is not found. Using CPU.")
+        cfg.trainer.accelerator = "cpu"
+        cfg.trainer.devices = 1
 
     if cfg.model.lazy:
         log.info("Using LazyTensor as backend.")
@@ -216,7 +220,7 @@ def set_mode(cfg):
                 cfg.trainer.precision = 16
 
     elif cfg.trainer.accelerator == "cpu":
-        log.info("Model will not be compiled.")
+        log.info("Model will not be compiled with CUDA Graph.")
         cfg.model.cudagraph_compile = False
         log.info("Setting optimizer capturable attribute to False.")
         cfg.model.optimizer.capturable = False
