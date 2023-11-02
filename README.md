@@ -15,10 +15,7 @@
 
 ## Description
 
-Our package introduces Physics-Informed Neural Networks (PINNs) implemented using PyTorch. The standout feature is the incorporation of CUDA Graphs and JIT Compilers (TorchScript) for compiling models, resulting in significant performance gains up to 9x compared to the original TensorFlow v1 implementation. Please read our paper to learn more:
-
-<a href="">PINNs-Torch: Enhancing Speed and Usability of Physics-Informed Neural Networks with PyTorch.</a> Reza Akbarian Bafghi, and Maziar Raissi. DLDE III, NeurIPS, 2023.
-</br>
+Our package introduces Physics-Informed Neural Networks (PINNs) implemented using PyTorch. The standout feature is the incorporation of CUDA Graphs and JIT Compilers (TorchScript) for compiling models, resulting in significant performance gains up to 9x compared to the original TensorFlow v1 implementation.
 
 <div align="center">
 <img src="http://drive.google.com/uc?export=view&id=1WVZSSQwFAyNAkSqNgvZqok2vkPhpoERy" width="1000">
@@ -26,6 +23,12 @@ Our package introduces Physics-Informed Neural Networks (PINNs) implemented usin
 <em>Each subplot corresponds to a distinct problem, with its iteration count displayed at the
 top. The logarithmic x-axis denotes the speed-up factor w.r.t the original code in TensorFlow v1, and the y-axis illustrates the mean relative error.</em>
 </div>
+</br>
+
+
+For more information, please refer to our paper:
+
+<a href="">PINNs-Torch: Enhancing Speed and Usability of Physics-Informed Neural Networks with PyTorch.</a> Reza Akbarian Bafghi, and Maziar Raissi. DLDE III, NeurIPS, 2023.
 
 ## Installation
 

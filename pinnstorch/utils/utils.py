@@ -203,7 +203,7 @@ def set_mode(cfg):
         log.info("Setting optimizer capturable attribute to True.")
         cfg.model.optimizer.capturable = True
         log.info("Disabling automatic optimization.")
-        if cfg.trainer.devices is not None:
+        if cfg.trainer.devices is not None and isinstance(cfg.trainer.devices, list):
             if len(cfg.trainer.devices) > 1:
                 log.info(
                     f"DDP is not supported for compiled model. Using device {cfg.trainer.devices[0]}"

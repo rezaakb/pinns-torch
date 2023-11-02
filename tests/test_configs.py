@@ -31,9 +31,9 @@ def pde_fn(outputs, x, extra_variables):
     """Define the partial differential equations (PDEs)."""
 
     U = outputs["u"]
-    U_x = pinnstorch.utils.fwd_gradient(U, x)
-    U_xx = pinnstorch.utils.fwd_gradient(U_x, x)
-    U_xxx = pinnstorch.utils.fwd_gradient(U_xx, x)
+    U_x = pinnstorch.utils.fwd_gradient(U, x)[0]
+    U_xx = pinnstorch.utils.fwd_gradient(U_x, x)[0]
+    U_xxx = pinnstorch.utils.fwd_gradient(U_xx, x)[0]
     outputs["f"] = -extra_variables["l1"] * U * U_x - torch.exp(extra_variables["l2"]) * U_xxx
     return outputs
 
