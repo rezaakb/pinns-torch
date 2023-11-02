@@ -1,7 +1,9 @@
 ## Discrete Inverse Burgurs' Equation
 
 Similar to its forward counterpart, we utilize Runge-Kutta methods with q stages. The equation here is given by:
+
 $$f^{n+c_j} = u_t + \lambda_1 u^{n+c_j}u_x^{n+c_j} - \lambda_2 u_{xx}^{n+c_j}$$
+
 The goal is to determine $\lambda_1$ and $\lambda_2$. Data points are taken from $t=0.1$ to $t=0.9$.
 
 ### Problem Setup

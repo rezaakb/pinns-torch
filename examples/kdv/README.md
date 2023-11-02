@@ -1,9 +1,13 @@
 ## Discrete Inverse Korteweg–de Vries Equation
 
 Given the non-linear KdV equation:
+
 $$ u_t + \lambda_1 uu_x + \lambda_2 u_{xxx} = 0,$$
+
 we use Runge–Kutta methods with q stages to identify parameters $\lambda = (\lambda_1, \lambda_2)$. The network outputs:
+
 $$ [u^n_1(x),\dots, u^n_q(x), u^n_{q+1}(x)] $$
+
 with $u^n$ as data at time $t^n$. Data is sampled at $t^n = 0.2$ and $t^{n+1} = 0.8$.
 
 ### Problem Setup
