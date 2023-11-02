@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from setuptools import find_packages, setup
+from setuptools import find_namespace_packages, setup, find_packages
 
 setup(
     name="pinnstorch",
@@ -14,8 +14,8 @@ setup(
     # use this to customize global commands available in the terminal after installing the package
     entry_points={
         "console_scripts": [
-            "train_command = src.train:main",
-            "eval_command = src.eval:main",
+            "train_command = pinnstorch.train:main",
         ]
     },
+    include_package_data=True,
 )

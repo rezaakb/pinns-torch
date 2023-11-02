@@ -78,3 +78,7 @@ plotting:
 
 seed: 1234
 task_name: burgers_continuous_forward
+
+hydra:
+  searchpath:
+    - pkg://pinnstorch/conf

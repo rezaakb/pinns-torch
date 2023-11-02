@@ -90,3 +90,8 @@ plotting:
 
 seed: 1234
 task_name: schrodinger
+
+
+hydra:
+  searchpath:
+    - pkg://pinnstorch/conf

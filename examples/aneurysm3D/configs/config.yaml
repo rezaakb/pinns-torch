@@ -83,3 +83,7 @@ optimized_metric:
     - w
 
 task_name: aneurysm3D
+
+hydra:
+  searchpath:
+    - pkg://pinnstorch/conf

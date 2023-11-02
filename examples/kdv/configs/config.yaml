@@ -101,3 +101,7 @@ plotting:
   _partial_: true
 
 task_name: kdv
+
+hydra:
+  searchpath:
+    - pkg://pinnstorch/conf
