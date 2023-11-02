@@ -1,16 +1,13 @@
 ## Discrete Forward Allen-Cahn Equation
 
 Given the non-linear AC equation:
-\begin{align*}
-u_t - 0.0001u_{xx} + 5u^3 - 5u &= 0, \\
-u(0, x) &= x^2 \cos(\pi x), \\
-u(t,-1) &= u(t, 1), \\
-u_x(t,-1) &= u_x(t, 1),
-\end{align*}
+$$u_t - 0.0001u_{xx} + 5u^3 - 5u = 0,$$
+$$u(0, x) = x^2 \cos(\pi x),$$
+$$u(t,-1) = u(t, 1),$$
+$$u_x(t,-1) = u_x(t, 1),$$
+
 with $x \in [-1, 1]$ and $t \in [0, 1]$, we adopt Runge–Kutta methods with q stages. The neural network output is:
-\begin{align*}
-[u^n_1(x),\dots, u^n_q(x), u^n_{q+1}(x)]
-\end{align*}
+$$[u^n_1(x),\dots, u^n_q(x), u^n_{q+1}(x)]$$
 where $u^n$ is data at time $t^n$. We extract data from the exact solution at $t_0 = 0.1$ aiming to predict the solution at $t_1 = 0.9$ using a single time-step of $\Delta t = 0.8$.
 
 ### Problem Setup

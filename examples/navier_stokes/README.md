@@ -1,30 +1,19 @@
 ## Continuous Inverse Navier-Stokes Equation
 Given the 2D nonlinear Navier-Stokes equation:
-\begin{align*}
-u_t + \lambda_1(uu_x + vu_y) &= -p_x + \lambda_2(u_{xx} + u_{yy}), \\
-v_t + \lambda_1(uv_x + vv_y) &= -p_y + \lambda_2(v_{xx} + v_{yy}),
-\end{align*}
+$$ u_t + \lambda_1(uu_x + vu_y) = -p_x + \lambda_2(u_{xx} + u_{yy}), $$
+$$v_t + \lambda_1(uv_x + vv_y) = -p_y + \lambda_2(v_{xx} + v_{yy}),$$
 where $u(t, x, y)$ and $v(t, x, y)$ are the x and y components of the velocity field, and $p(t, x, y)$ is the pressure, we seek the unknowns $\lambda = (\lambda_1, \lambda_2)$. When required, we integrate the constraints:
-\begin{align}
-0 &= u_x + v_y, \\
-u &= \psi_y, \\
-v &= -\psi_x,
-\end{align}
+$$ 0 = u_x + v_y,$$
+$$ u = \psi_y,$$
+$$ v = -\psi_x,$$
 We use a dual-output neural network to approximate $[\psi(t, x, y), p(t, x, y)]$, leading to a physics-informed neural network $[f(t, x, y), g(t, x, y)]$. 
 
 ### Problem Setup 
 
 | Continuous Inverse Navier-Stokes Equation | |
 |------------------------------|---|
-| PDE equations | \begin{aligned}
-        f &=  u_t + \lambda_1 (u u_x + v u_y)
-        + p_x - \lambda_2  (u_{xx} + u_{yy}), \\
-        g &= v_t + \lambda_1 (u v_x + v  v_y) + p_y - \lambda_2  (v_{xx} + v_{yy})
-    \end{aligned} |
-| Assumptions | \begin{aligned}
-        u &= \psi_y, \\
-        v &= -\psi_x
-    \end{aligned} |
+| PDE equations | $$ f =  u_t + \lambda_1 (u u_x + v u_y) + p_x - \lambda_2  (u_{xx} + u_{yy}), $$ $$ g = v_t + \lambda_1 (u v_x + v  v_y) + p_y - \lambda_2  (v_{xx} + v_{yy}) $$ |
+| Assumptions | $$ u = \psi_y, v = -\psi_x $$ |
 | The output of net | $[\psi(t, x, y), p(t, x, y)]$ |
 | Layers of net | $[3] + 8 \times [20] +[2]$ |
 | Sample count from collection points | $5000^*$ |

@@ -1,5 +1,5 @@
 defaults:
-  - ../../../configs/train
+  - train
   - _self_
 
 idx_t0: 40

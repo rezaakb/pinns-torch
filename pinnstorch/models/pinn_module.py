@@ -41,7 +41,7 @@ class PINNModule(LightningModule):
         self,
         net: torch.nn.Module,
         pde_fn,
-        optimizer: torch.optim.Optimizer,
+        optimizer: torch.optim.Optimizer = torch.optim.Adam,
         scheduler: torch.optim.lr_scheduler = None,
         scaler: torch.cuda.amp.GradScaler = None,
         loss_fn: str = "sse",
@@ -66,10 +66,10 @@ class PINNModule(LightningModule):
         :param scheduler: Optional learning rate scheduler.
         :param scaler: Optional gradient scaler for AMP.
         :param loss_fn: The loss function to use, either "sse" or "mse".
-        :param extra_variables: Optional extra variables for extended functionality.
+        :param extra_variables: Optional extra variables in inverse problems.
         :param output_fn: Optional function to process the model's output.
         :param runge_kutta: Optional Runge-Kutta method for solving PDEs.
-        :param cudagraph_compile: Flag to enable CUDA Graph compilation.
+        :param cudagraph_compile: Flag to enable CUDA Graph compilation. It works only with a single GPU.
         :param jit_compile: Flag to enable JIT compilation.
         :param amp: Flag to enable Automatic Mixed Precision (AMP).
         :param lazy: Flag to enable the use of LazyTensors.

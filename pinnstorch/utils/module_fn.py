@@ -126,3 +126,21 @@ def set_requires_grad(x: List[torch.Tensor],
     x = [x_.requires_grad_(enable_grad) for x_ in x]
 
     return x, t
+
+def fix_predictions(preds_list: List[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tensor]:
+    """It will concatenate predictions for each solution 
+    into a tensor and return a dictionary including them.
+
+    :param preds_list: List of dictionary of predictions.
+    :return: A dictionary containing the predictions.
+    """
+    preds_dict = {}
+    for preds in preds_list:
+        for sol_key, pred in preds.items():
+            if sol_key in preds_dict.keys():
+                preds_dict[sol_key] = torch.cat((preds_dict[sol_key], pred.detach()), 0)
+            else:
+                preds_dict[sol_key] = pred.detach()
+    return preds_dict
+
+

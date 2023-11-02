@@ -1,5 +1,5 @@
 defaults:
-  - ../../../configs/train
+  - train
   - _self_
 
 q: 500

@@ -11,18 +11,21 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 <br>
-
+<a href="">[Paper]</a> - <a href="">[TensorFlow v2]</a> - <a href="https://github.com/maziarraissi/PINNs">[TensorFlow v1]</a>
 </div>
 
 ## Description
 
-Our package introduces Physics-Informed Neural Networks (PINNs) implemented using PyTorch. The standout feature is the incorporation of CUDAGraphs for compiling models, resulting in significant performance gains of 3x to 15x compared to traditional PyTorch implementations.
+Our package introduces Physics-Informed Neural Networks (PINNs) implemented using PyTorch. The standout feature is the incorporation of CUDA Graphs and JIT Compilers (TorchScript) for compiling models, resulting in significant performance gains up to 9x compared to the original TensorFlow v1 implementation.
 
 <div align="center">
-<img src="http://drive.google.com/uc?export=view&id=1qbDpnSZiDRm5CQKjAUkNsfYcDqLEShQA" width="500">
+<img src="http://drive.google.com/uc?export=view&id=1WVZSSQwFAyNAkSqNgvZqok2vkPhpoERy" width="1000">
 </br>
-<em>Comparing elapsed time for a single epoch in solving Navier-Stokes, Allen-Cahn, and Burgers partial differential equations using naive models and models compiled with CUDAGraphs. </em>
+<em>Each subplot corresponds to a distinct problem, with its iteration count displayed at the
+top. The logarithmic x-axis denotes the speed-up factor w.r.t the original code in TensorFlow v1, and the y-axis illustrates the mean relative error.</em>
 </div>
+<br>
+Accepted at DLDE III, NeurIPS 2023.
 
 ## Installation
 
@@ -54,17 +57,24 @@ pip install -e .
 
 ## Quick start
 
-There are several implemented examples on [examples](examples) folder. For example, you can run the code corresponding to navier stokes pde:
+Explore a variety of implemented examples within the [examples](examples) folder. To run a specific code, such as the one for the Navier-Stokes PDE, you can use:
 
 ```bash
 python examples/navier_stokes/train.py
 ```
 
-Train model with chosen experiment configuration; for example, from [examples/navier_stokes/configs/config.yaml](examples/navier_stokes/configs/config.yaml). You can override any parameter from command line like this
+You can train the model using a specified configuration, like the one found in [examples/navier_stokes/configs/config.yaml](examples/navier_stokes/configs/config.yaml). Parameters can be overridden directly from the command line. For instance:
 
 ```bash
 python examples/navier_stokes/train.py trainer.max_epochs=20 n_train=3000
 ```
+
+To utilize our package, there are two primary options:
+
+- Implement your training structures using Hydra, as illustrated in our provided examples.
+- Directly incorporate our package to solve your custom problem.
+
+For a practical guide on directly using our package to solve the Schrödinger PDE in a continuous forward problem, refer to our tutorial here: [tutorials/0-Schrodinger.ipynb](tutorials/0-Schrodinger.ipynb).
 
 ## Data
 
@@ -72,7 +82,7 @@ The data located on the server and will be downloaded automatically upon running
 
 ## Contributing
 
-We greatly value contributions from the community. If you identify any missing features, encounter bugs, or notice unexpected behavior while utilizing this library, we kindly invite you to open an issue or submit a pull request on GitHub. Alternatively, please feel free to reach out to the authors directly. Your input is highly appreciated and will help enhance the quality of our project.
+As this is the first version of our package, there might be scope for enhancements and bug fixes. We highly value community contributions. If you find any issues, missing features, or unusual behavior during your usage of this library, please feel free to open an issue or submit a pull request on GitHub. For any queries, suggestions, or feedback, please send them to [Reza Akbarian Bafghi](https://www.linkedin.com/in/rezaakbarian/) at [reza.akbarianbafghi@colorado.edu](mailto:reza.akbarianbafghi@colorado.edu).
 
 ## License
 
@@ -80,10 +90,11 @@ Distributed under the terms of the \[BSD-3\] license, "pinnstorch" is free and o
 
 ## Resources
 
-We employed [this template](https://github.com/ashleve/lightning-hydra-template) to develop the package, drawing from its structure and design principles. For a deeper understanding, we recommend visiting their GitHub repository.
+We employed [this template](https://github.com/ashleve/lightning-hydra-template) to develop the package, drawing from its structure and design principles. For a deeper understanding, we recommend visiting their GitHub repository. We also recommend consulting the official documentation of [Hydra](https://hydra.cc/docs/intro/) and [PyTorch Lightning](https://lightning.ai/) for additional insights.
+
 
 ## Citation
-
+If you find this useful in your research, please consider citing:
 ```
 @inproceedings{
 bafghi2023pinnstorch,
@@ -92,4 +103,5 @@ author={Reza Akbarian Bafghi and Maziar Raissi},
 booktitle={The Symbiosis of Deep Learning and Differential Equations III},
 year={2023},
 url={https://openreview.net/forum?id=nl1ZzdHpab}
-}```
+}
+```

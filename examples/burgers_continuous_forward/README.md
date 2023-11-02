@@ -1,14 +1,10 @@
 ## Continuous Forward Burgers' Equation
 Given the Burgers' equation:
-\begin{align*}
-u_t + uu_x - (0.01/\pi)u_{xx} = 0,
-\end{align*}
+$$ u_t + uu_x - (0.01/\pi)u_{xx} = 0, $$
 with domain $x \in [-1, 1]$ and $t \in [0, 1]$, and the initial and boundary conditions:
-\begin{align*}
-u(0, x) &= -\sin(\pi x), \\
-u(t,-1) &= 0, \\
-u(t, 1) &= 0.
-\end{align*}
+$$u(0, x) = -\sin(\pi x), $$
+$$u(t,-1) = 0,$$
+$$u(t, 1) = 0.$$
 
 ### Problem Setup 
 

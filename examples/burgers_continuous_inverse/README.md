@@ -1,8 +1,6 @@
 ## Continuous Inverse Burgers' Equation
 Considering the equation:
-\begin{align*}
-u_t + \lambda_1uu_x - \lambda_2 u_{xx} = 0,
-\end{align*}
+$$u_t + \lambda_1uu_x - \lambda_2 u_{xx} = 0,$$
 we aim to both predict the solution $u(t, x)$ and determine the unknown parameters $\lambda = (\lambda_1, \lambda_2)$.
 
 ### Problem Setup 

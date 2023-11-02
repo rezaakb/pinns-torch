@@ -1,9 +1,7 @@
 ## Discrete Forward Burgurs' Equation
 
 For this problem, we use data from $t_1 = 0.1$ to predict solutions at $t_2 = 0.9$ utilizing Runge-Kutta methods with q stages. The equation is:
-\begin{align*}
-f^{n+c_j} = u_t + u^{n+c_j}u_x^{n+c_j} - (0.01/\pi)u_{xx}^{n+c_j}
-\end{align*}
+$$f^{n+c_j} = u_t + u^{n+c_j}u_x^{n+c_j} - (0.01/\pi)u_{xx}^{n+c_j}$$
 Here, $u^n$ indicates information at time $t^n$.
 
 ### Problem Setup

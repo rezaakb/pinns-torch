@@ -174,13 +174,7 @@ def train(
         preds_list = trainer.predict(
             model=model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path")
         )
-        preds_dict = {}
-        for preds in preds_list:
-            for sol_key, pred in preds.items():
-                if sol_key in preds_dict.keys():
-                    preds_dict[sol_key] = torch.cat((preds_dict[sol_key], pred.detach()), 0)
-                else:
-                    preds_dict[sol_key] = pred.detach()
+        preds_dict = pinnstorch.utils.fix_predictions(preds_list)
         hydra.utils.instantiate(
             cfg.plotting,
             mesh=mesh,

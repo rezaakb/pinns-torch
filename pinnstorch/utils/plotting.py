@@ -1,10 +1,12 @@
 import logging
+import os
 from itertools import combinations, product
 
 import matplotlib as mpl
 import matplotlib.gridspec as gridspec
 import numpy as np
 import scipy.io
+
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.interpolate import griddata
@@ -53,8 +55,11 @@ def savefig(filename, crop=True):
     :param filename: Name of the output file (without extension).
     :param crop: Whether to apply tight cropping to the saved image (default is True).
     """
-
-    log.info(f"Image saved at {filename}")
+    
+    dir_name = os.path.dirname(filename)
+    if dir_name and not os.path.exists(dir_name):
+        os.makedirs(dir_name)
+    
 
     if crop:
         plt.savefig(f"{filename}.pdf", bbox_inches="tight", pad_inches=0)
@@ -62,6 +67,8 @@ def savefig(filename, crop=True):
     else:
         plt.savefig(f"{filename}.pdf")
         plt.savefig(f"{filename}.eps")
+
+    log.info(f"Image saved at {filename}")
 
 
 def plot_navier_stokes(mesh, preds, train_datasets, val_dataset, file_name):
@@ -456,7 +463,7 @@ def plot_schrodinger(mesh, preds, train_datasets, val_dataset, file_name):
         markersize=4,
         clip_on=False,
     )
-    line = np.linspace(mesh.spatial_domain[:].min(), mesh.spatial_domain[:].max(), 2)[:, None]
+    line = np.linspace(mesh.spatial_domain_mesh[:].min(), mesh.spatial_domain_mesh[:].max(), 2)[:, None]
 
     ax.plot(mesh.time_domain[75] * np.ones((2, 1)), line, "k--", linewidth=1)
     ax.plot(mesh.time_domain[100] * np.ones((2, 1)), line, "k--", linewidth=1)
@@ -472,8 +479,8 @@ def plot_schrodinger(mesh, preds, train_datasets, val_dataset, file_name):
     gs1.update(top=1 - 1 / 3, bottom=0, left=0.1, right=0.9, wspace=0.5)
 
     ax = plt.subplot(gs1[0, 0])
-    ax.plot(mesh.spatial_domain[:], Exact_h[:, 75], "b-", linewidth=2, label="Exact")
-    ax.plot(mesh.spatial_domain[:], H_pred[:, 75], "r--", linewidth=2, label="Prediction")
+    ax.plot(mesh.spatial_domain_mesh[:, 75, 0], Exact_h[:, 75], "b-", linewidth=2, label="Exact")
+    ax.plot(mesh.spatial_domain_mesh[:, 75, 0], H_pred[:, 75], "r--", linewidth=2, label="Prediction")
     ax.set_xlabel("$x$")
     ax.set_ylabel("$|h(t,x)|$")
     ax.set_title("$t = %.2f$" % (mesh.time_domain[75]), fontsize=10)
@@ -482,8 +489,8 @@ def plot_schrodinger(mesh, preds, train_datasets, val_dataset, file_name):
     ax.set_ylim([-0.1, 5.1])
 
     ax = plt.subplot(gs1[0, 1])
-    ax.plot(mesh.spatial_domain[:], Exact_h[:, 100], "b-", linewidth=2, label="Exact")
-    ax.plot(mesh.spatial_domain[:], H_pred[:, 100], "r--", linewidth=2, label="Prediction")
+    ax.plot(mesh.spatial_domain_mesh[:, 100, 0], Exact_h[:, 100], "b-", linewidth=2, label="Exact")
+    ax.plot(mesh.spatial_domain_mesh[:, 100, 0], H_pred[:, 100], "r--", linewidth=2, label="Prediction")
     ax.set_xlabel("$x$")
     ax.set_ylabel("$|h(t,x)|$")
     ax.axis("square")
@@ -493,8 +500,8 @@ def plot_schrodinger(mesh, preds, train_datasets, val_dataset, file_name):
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.8), ncol=5, frameon=False)
 
     ax = plt.subplot(gs1[0, 2])
-    ax.plot(mesh.spatial_domain[:], Exact_h[:, 125], "b-", linewidth=2, label="Exact")
-    ax.plot(mesh.spatial_domain[:], H_pred[:, 125], "r--", linewidth=2, label="Prediction")
+    ax.plot(mesh.spatial_domain_mesh[:, 125, 0], Exact_h[:, 125], "b-", linewidth=2, label="Exact")
+    ax.plot(mesh.spatial_domain_mesh[:, 125, 0], H_pred[:, 125], "r--", linewidth=2, label="Prediction")
     ax.set_xlabel("$x$")
     ax.set_ylabel("$|h(t,x)|$")
     ax.axis("square")

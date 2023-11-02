@@ -10,7 +10,7 @@ setup(
     author_email="reza.akbarianbafghi@coloardo.edu",
     url="https://github.com/rezaakb/pinns-torch",
     install_requires=["lightning", "hydra-core", "scipy", "pyDOE", "matplotlib"],
-    packages=find_packages(),
+    packages=find_packages(include='pinnstorch.*'),
     # use this to customize global commands available in the terminal after installing the package
     entry_points={
         "console_scripts": [
