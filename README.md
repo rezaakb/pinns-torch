@@ -48,8 +48,8 @@ pip install pinnstorch
 If you intend to introduce new functionalities or make code modifications, we suggest duplicating the repository and setting up a local installation:
 
 ```bash
-git clone https://github.com/rezaakb/pinnstorch
-cd pinnstorch
+git clone https://github.com/rezaakb/pinns-torch
+cd pinns-torch
 
 # [OPTIONAL] create conda environment
 conda create -n myenv python=3.9
