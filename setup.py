@@ -2,12 +2,18 @@
 
 from setuptools import find_namespace_packages, setup, find_packages
 
+# read the contents of your README file
+from pathlib import Path
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
+
 setup(
     name="pinnstorch",
     version="0.0.1",
-    description="An implementation of PINNs in pytorch using Lightning and Hydra.",
+    description="An implementation of PINNs in PyTorch using Lightning and Hydra.",
     author="Reza Akbarian Bafghi",
     author_email="reza.akbarianbafghi@coloardo.edu",
+    long_description=long_description,
     url="https://github.com/rezaakb/pinns-torch",
     install_requires=["lightning", "hydra-core", "scipy", "pyDOE", "matplotlib", "tqdm"],
     packages=find_packages(include='pinnstorch.*'),
@@ -18,4 +24,9 @@ setup(
         ]
     },
     include_package_data=True,
+    classifiers=[
+    'Development Status :: 2 - Pre-Alpha',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+],
 )

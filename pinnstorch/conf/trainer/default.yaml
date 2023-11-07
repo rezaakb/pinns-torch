@@ -9,7 +9,6 @@ accelerator: cpu
 devices: 1
 #benchmark: true
 
-enable_model_summary: true
 enable_progress_bar: true
 
 # mixed precision for extra speed-up

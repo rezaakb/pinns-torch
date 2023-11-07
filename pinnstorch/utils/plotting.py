@@ -1,5 +1,5 @@
-import logging
 import os
+import logging
 from itertools import combinations, product
 
 import matplotlib as mpl
