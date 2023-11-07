@@ -9,6 +9,7 @@
 <a href="https://hydra.cc/"><img alt="Config: Hydra" src="https://img.shields.io/badge/Config-Hydra-89b8cd"></a>
 <a href="https://github.com/ashleve/lightning-hydra-template"><img alt="Template" src="https://img.shields.io/badge/-Lightning--Hydra--Template-017F2F?style=flat&logo=github&labelColor=gray"></a>
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rezaakb/pinns-torch/blob/main/tutorials/0-Schrodinger.ipynb)
 
 <a href="https://openreview.net/forum?id=nl1ZzdHpab">[Paper]</a> - <a href="https://github.com/rezaakb/pinns-tf2">[TensorFlow v2]</a> - <a href="https://github.com/maziarraissi/PINNs">[TensorFlow v1]</a>
 </div>

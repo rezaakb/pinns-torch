@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from setuptools import find_namespace_packages, setup, find_packages
+from setuptools import setup, find_packages
 
 # read the contents of your README file
 from pathlib import Path
@@ -9,12 +9,14 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="pinnstorch",
-    version="0.0.1",
+    version="0.1.0",
     description="An implementation of PINNs in PyTorch using Lightning and Hydra.",
     author="Reza Akbarian Bafghi",
     author_email="reza.akbarianbafghi@coloardo.edu",
     long_description=long_description,
+    long_description_content_type='text/markdown',
     url="https://github.com/rezaakb/pinns-torch",
+    license='BSD-3-Clause',
     install_requires=["lightning", "hydra-core", "scipy", "pyDOE", "matplotlib", "tqdm"],
     packages=find_packages(include='pinnstorch.*'),
     # use this to customize global commands available in the terminal after installing the package
