@@ -38,6 +38,18 @@ val_dataset:
         - w
         - p
 
+pred_dataset:
+  - mesh_sampler:
+      _target_: pinnstorch.data.MeshSampler
+      _partial_: true
+      idx_t: 100
+      solution:
+        - c
+        - u
+        - v
+        - w
+        - p
+
 test_dataset:
   - mesh_sampler:
       _target_: pinnstorch.data.MeshSampler
@@ -74,6 +86,7 @@ trainer:
 train: true
 val: true
 test: false
+save_pred: true 
 
 optimized_metric:
   error:

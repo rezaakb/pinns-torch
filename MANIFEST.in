@@ -1,0 +1,3 @@
+include pinnstorch/conf/*.yaml
+include pinnstorch/conf/*/*.yaml
+

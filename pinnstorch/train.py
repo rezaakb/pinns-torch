@@ -5,6 +5,7 @@ import time
 import hydra
 import lightning as L
 import rootutils
+import pickle 
 import torch
 import numpy as np
 
@@ -169,12 +170,19 @@ def train(
 
     test_metrics = trainer.callback_metrics
 
-    if cfg.get("plotting"):
-        log.info("Plotting the results")
+    if cfg.get("pred_dataset"):
         preds_list = trainer.predict(
             model=model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path")
         )
-        preds_dict = pinnstorch.utils.fix_predictions(preds_list)
+        preds_dict = utils.fix_predictions(preds_list)
+        if cfg.get("save_pred"):
+            pred_path = f'{cfg.paths.output_dir}/predictions.pkl'
+            with open(pred_path, 'wb') as f:
+                pickle.dump(preds_dict, f)
+            log.info(f"Predictions saved at: {pred_path}")
+        
+    if cfg.get("plotting"):
+        log.info("Plotting the results")
         hydra.utils.instantiate(
             cfg.plotting,
             mesh=mesh,

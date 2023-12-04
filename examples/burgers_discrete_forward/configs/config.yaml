@@ -57,6 +57,14 @@ val_dataset:
       solution:
         - u
 
+pred_dataset:
+  - mesh_sampler:
+      _target_: pinnstorch.data.DiscreteMeshSampler
+      _partial_: true
+      idx_t: ${idx_t1}
+      solution:
+        - u
+
 net:
   _target_: pinnstorch.models.FCN
   layers:

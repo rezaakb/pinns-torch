@@ -58,6 +58,13 @@ val_dataset:
         - v
         - h
 
+pred_dataset:
+  - mesh_sampler:
+      _target_: pinnstorch.data.MeshSampler
+      _partial_: true
+      solution:
+        - h
+
 net:
   _target_: pinnstorch.models.FCN
   layers: [2, 100, 100, 100, 100, 2]
@@ -78,6 +85,8 @@ model:
 train: true
 test: false
 val: true
+save_pred: true 
+
 optimized_metric:
   error:
     - u

@@ -2,12 +2,9 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import hydra
 import numpy as np
-import rootutils
 import torch
 
 import pinnstorch
-
-rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
 from omegaconf import DictConfig
 

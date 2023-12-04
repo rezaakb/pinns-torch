@@ -2,8 +2,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import hydra
 import numpy as np
-import rootutils
 import torch
+
 from omegaconf import DictConfig
 
 import pinnstorch
