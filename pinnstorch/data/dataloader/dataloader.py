@@ -37,7 +37,7 @@ class PINNDataLoader:
         if self.ignore:
             return self.dataset_size // self.batch_size
         else:
-            return (self.dataset_size // self.batch_size) + 1
+            return (self.dataset_size + self.batch_size - 1) // self.batch_size
 
     def __iter__(self):
         """Initialize the data loader iterator.
