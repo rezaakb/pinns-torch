@@ -118,6 +118,9 @@ def train(
         net: torch.nn.Module = hydra.utils.instantiate(cfg.net)(
             mean=train_datasets[0].mean, std=train_datasets[0].std
         )
+    elif cfg.net._target_ == "pinnstorch.models.FCNCUSTOM":
+        log.info(f"Instantiating neural net <{cfg.net._target_}>")
+        net: torch.nn.Module = hydra.utils.instantiate(cfg.net)(lb=mesh.lb, ub=mesh.ub)
 
     log.info(f"Instantiating model <{cfg.model._target_}>")
 

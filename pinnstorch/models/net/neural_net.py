@@ -74,7 +74,7 @@ class FCN(nn.Module):
                 z = torch.cat((x, y, z), 1)
             else:
                 z = spatial[0]
-            z = 2.0 * (z - self.lb[:-1]) / (self.ub[:-1] - self.lb[:-1]) - 1.0
+            z = 2.0 * (z - self.lb[:-1]) / (self.ub[:-1] - self.lb[:-1]) - 1.0  # creates nan when spatial domain is constant
 
         # Continuous Mode
         else:
@@ -87,7 +87,10 @@ class FCN(nn.Module):
             else:
                 x, y, z = spatial
                 z = torch.cat((x, y, z, time), 1)
-            z = 2.0 * (z - self.lb) / (self.ub - self.lb) - 1.0
+
+            den = (self.ub - self.lb).clamp_min(1e-6)
+            den_safe = torch.where(den == 0, torch.ones_like(den), den)
+            z = 2.0 * (z - self.lb) / den_safe - 1.0               
 
         z = self.model(z)
 
@@ -184,8 +187,130 @@ class NetHFM(nn.Module):
         outputs_dict = {name: H[:, i : i + 1] for i, name in enumerate(self.output_names)}
 
         return outputs_dict
+    
+class FCNCUSTOM(nn.Module):
+    """A simple fully-connected neural net for solving equations.
+
+    In this model, lower and upper bound will be used for normalization of input data
+    """
+    output_names: List[str]
+    
+    def __init__(self, layers, lb, ub, output_names, discrete: bool = False) -> None:
+        """Initialize a `FCN` module.
+
+        :param layers: The list indicating number of neurons in each layer.
+        :param lb: Lower bound for the inputs.
+        :param ub: Upper bound for the inputs.
+        :param output_names: Names of outputs of net.
+        :param discrete: If the problem is discrete or not.
+        """
+        super().__init__()
+
+        self.model = self.initalize_net(layers)
+        self.register_buffer("lb", torch.tensor(lb, dtype=torch.float32, requires_grad=False))
+        self.register_buffer("ub", torch.tensor(ub, dtype=torch.float32, requires_grad=False))
+        self.output_names = output_names
+        self.discrete = discrete
+
+    def initalize_net(self, layers: List):
+        """Initialize the layers of the neural network with skip connections."""
+        initializer = nn.init.xavier_uniform_
+        # Build lists of layers and activations
+        linears = nn.ModuleList()
+        acts    = nn.ModuleList()
+
+        # Input layer
+        layer = nn.Linear(layers[0], layers[1])
+        initializer(layer.weight)
+        linears.append(layer)
+        acts.append(nn.Tanh())
+
+        # Hidden layers
+        for i in range(1, len(layers) - 2):
+            layer = nn.Linear(layers[i], layers[i + 1])
+            initializer(layer.weight)
+            linears.append(layer)
+            acts.append(nn.Tanh())
+
+        # Output layer (no activation)
+        out_layer = nn.Linear(layers[-2], layers[-1])
+        initializer(out_layer.weight)
+
+        # Wrap in a single module with skip connections
+        class SkipNet(nn.Module):
+            def __init__(self, linears, acts, out_layer):
+                super().__init__()
+                self.linears = linears
+                self.acts    = acts
+                self.out     = out_layer
+
+            def forward(self, z):
+                h = z
+                # First layer
+                h = self.acts[0](self.linears[0](h))
+                # Hidden layers with skip every other layer
+                for idx in range(1, len(self.linears)):
+                    if idx < len(self.acts):
+                        h_next = self.acts[idx](self.linears[idx](h))
+                    else:
+                        h_next = h
+                    if idx % 2 == 1:
+                        h = h + h_next
+                    else:
+                        h = h_next
+                return self.out(h)
+
+        return SkipNet(linears, acts, out_layer)
+
+    def forward(self, spatial: List[torch.Tensor], time: torch.Tensor) -> Dict[str, torch.Tensor]:
+        """Perform a single forward pass through the network.
+
+        :param spatial: List of input spatial tensors.
+        :param time: Input tensor representing time.
+        :return: A tensor of solutions.
+        """
+
+        # Discrete Mode
+        if self.discrete:
+            if len(spatial) == 2:
+                x, y = spatial
+                z = torch.cat((x, y), 1)
+            elif len(spatial) == 3:
+                x, y, z = spatial
+                z = torch.cat((x, y, z), 1)
+            else:
+                z = spatial[0]
+            z = 2.0 * (z - self.lb[:-1]) / (self.ub[:-1] - self.lb[:-1]) - 1.0  # creates nan when spatial domain is constant
+
+        # Continuous Mode
+        else:
+            if len(spatial) == 1:
+                x = spatial[0]
+                z = torch.cat((x, time), 1)
+            elif len(spatial) == 2:
+                x, y = spatial
+                z = torch.cat((x, y, time), 1)
+            else:
+                x, y, z = spatial
+                z = torch.cat((x, y, z, time), 1)
+
+            den = (self.ub - self.lb).clamp_min(1e-6)
+            den_safe = torch.where(den == 0, torch.ones_like(den), den)
+            z = 2.0 * (z - self.lb) / den_safe - 1.0               
+
+        z = self.model(z)
+
+        # Discrete Mode
+        if self.discrete:
+            outputs_dict = {name: z for i, name in enumerate(self.output_names)}
+
+        # Continuous Mode
+        else:
+            outputs_dict = {name: z[:, i : i + 1] for i, name in enumerate(self.output_names)}
+        return outputs_dict
 
 
 if __name__ == "__main__":
     _ = FCN()
     _ = NetHFM()
+    _ = FCNCUSTOM()
