@@ -1,0 +1,176 @@
+defaults:
+  - train
+  - _self_
+
+n_train: 150
+
+mesh:
+  _target_: pinnstorch.data.PointCloud
+  root_dir: ${paths.data_dir}
+  read_data_fn: ???
+
+train_datasets:
+  - mesh_sampler:
+      _target_: pinnstorch.data.MeshSampler
+      _partial_: true
+      num_sample: ${n_train}
+      solution:
+        - bz
+        - br
+        - bp
+        - tflz
+        - tfrz
+        - trlz
+        - trrz
+        - vx
+        - vy
+      collection_points:
+        - res_bz
+        - res_br
+        - res_bp
+        - res_tflz
+        - res_tfrz
+        - res_trlz
+        - res_trrz
+
+val_dataset:
+  - mesh_sampler:
+      _target_: pinnstorch.data.MeshSampler
+      _partial_: true
+      solution:
+        - bz
+        - br
+        - bp
+        - tflz
+        - tfrz
+        - trlz
+        - trrz
+
+test_dataset:
+  - mesh_sampler:
+      _target_: pinnstorch.data.MeshSampler
+      _partial_: true
+      solution:
+        - bz
+        - br
+        - bp
+        - tflz
+        - tfrz
+        - trlz
+        - trrz
+        - vx
+        - vy
+
+net:
+  _target_: pinnstorch.models.FCN
+  layers: [2, 250, 250, 250, 250, 250, 250, 250, 250, 18]
+  output_names:
+    - bz
+    - br
+    - bp
+    - tflz
+    - tfrz
+    - trlz
+    - trrz
+    - vx
+    - vy
+    - y1
+    - y2
+    - y3
+    - y4
+    - rFz
+    - rMx
+    - rMy
+    - rFs_fl
+    - rFs_fr
+    - rFs_rl
+    - rFs_rr
+
+model:
+  extra_variables:
+    # Sprung/unsprung inertias & masses (normalized params in [-1,1])
+    m: 0.0
+    m_f: 0.0
+    m_r: 0.0
+    I_x: 0.0
+    I_y: 0.0
+
+    # Suspension (body↔unsprung)
+    kf: 0.0
+    kr: 0.0
+    cf: 0.0
+    cr: 0.0
+    cf_comp: 0.0
+    cf_reb: 0.0
+    cr_comp: 0.0
+    cr_reb: 0.0
+
+    # Tires (unsprung↔road)
+    ktf: 0.0
+    ktr: 0.0
+    ctf: 0.0
+    ctr: 0.0
+    ctf_comp: 0.0
+    ctf_reb: 0.0
+    ctr_comp: 0.0
+    ctr_reb: 0.0
+
+    # Stops
+    j0_f: 0.0
+    j0_r: 0.0
+    top0_f: 0.0
+    top0_r: 0.0
+    kf_bump: 0.0
+    kr_bump: 0.0
+    kf_top: 0.0
+    kr_top: 0.0
+
+    # Anti-roll bar
+    kR: 0.0
+
+    # Aero
+    cdown: 0.0
+    cpitch: 0.0
+    v2: 0.0
+
+    # Geometry
+    # b1: 0.0
+    # b2: 0.0
+    # a1: 0.0
+    # a2: 0.0
+
+trainer:
+  accelerator: gpu
+  max_epochs: 150000
+  devices: [0]
+  deterministic: false
+  check_val_every_n_epoch: 10000
+
+optimizer:
+  lr: 1e-2
+  loss_fn: sse
+
+train: true
+val: true
+test: false
+optimized_metric:
+  error:
+    - bz
+    - br
+    - bp
+    - tflz
+    - tfrz
+    - trlz
+    - trrz
+  extra_variables:
+    - m
+
+# plotting:
+#   _target_: pinnstorch.utils.plot_navier_stokes
+#   _partial_: true
+
+task_name: weight
+
+hydra:
+  searchpath:
+    - pkg://pinnstorch/conf
