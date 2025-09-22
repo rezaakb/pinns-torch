@@ -11,18 +11,14 @@ class FCN(nn.Module):
     In this model, lower and upper bound will be used for normalization of input data
     """
     output_names: List[str]
-    
-    def __init__(self, layers, lb, ub, output_names, discrete: bool = False) -> None:
-        """Initialize a `FCN` module.
 
-        :param layers: The list indicating number of neurons in each layer.
-        :param lb: Lower bound for the inputs.
-        :param ub: Upper bound for the inputs.
-        :param output_names: Names of outputs of net.
-        :param discrete: If the problem is discrete or not.
-        """
+    def __init__(self, layers, lb, ub, output_names, discrete: bool = False, 
+                dropout_rate: float = 0.0, enable_mc_dropout: bool = False) -> None:
         super().__init__()
-
+        
+        self.dropout_rate = dropout_rate
+        self.enable_mc_dropout = enable_mc_dropout
+        
         self.model = self.initalize_net(layers)
         self.register_buffer("lb", torch.tensor(lb, dtype=torch.float32, requires_grad=False))
         self.register_buffer("ub", torch.tensor(ub, dtype=torch.float32, requires_grad=False))
@@ -30,31 +26,57 @@ class FCN(nn.Module):
         self.discrete = discrete
 
     def initalize_net(self, layers: List):
-        """Initialize the layers of the neural network.
-
-        :param layers: The list indicating number of neurons in each layer.
-        :return: The initialized neural network.
-        """
-
         initializer = nn.init.xavier_uniform_
         net = nn.Sequential()
 
         input_layer = nn.Linear(layers[0], layers[1])
         initializer(input_layer.weight)
-
         net.add_module("input", input_layer)
         net.add_module("activation_1", nn.Tanh())
+        
+        if self.dropout_rate > 0:
+            net.add_module("dropout_1", nn.Dropout(self.dropout_rate))
 
         for i in range(1, len(layers) - 2):
             hidden_layer = nn.Linear(layers[i], layers[i + 1])
             initializer(hidden_layer.weight)
             net.add_module(f"hidden_{i+1}", hidden_layer)
             net.add_module(f"activation_{i+1}", nn.Tanh())
+            
+            if self.dropout_rate > 0:
+                net.add_module(f"dropout_{i+1}", nn.Dropout(self.dropout_rate))
 
         output_layer = nn.Linear(layers[-2], layers[-1])
         initializer(output_layer.weight)
         net.add_module("output", output_layer)
+        
         return net
+
+    def mc_predict(self, spatial: List[torch.Tensor], time: torch.Tensor, 
+                num_samples: int = 100) -> Dict[str, torch.Tensor]:
+        if not self.enable_mc_dropout:
+            raise ValueError("MC-Dropout is not enabled for this model")
+        
+        was_training = self.training
+        self.train()  # Force training mode to keep dropout active
+        
+        predictions = []
+        
+        with torch.no_grad():
+            for _ in range(num_samples):
+                pred = self.forward(spatial, time)
+                predictions.append(pred)
+        
+        self.train(was_training)
+        
+        results = {}
+        for key in predictions[0].keys():
+            stacked_preds = torch.stack([pred[key] for pred in predictions])
+            results[f"{key}_mean"] = torch.mean(stacked_preds, dim=0)
+            results[f"{key}_std"] = torch.std(stacked_preds, dim=0)
+            results[f"{key}_samples"] = stacked_preds
+        
+        return results
 
     def forward(self, spatial: List[torch.Tensor], time: torch.Tensor) -> Dict[str, torch.Tensor]:
         """Perform a single forward pass through the network.

@@ -66,13 +66,21 @@ pred_dataset:
       # num_sample: null  # Use all mesh points for prediction to match exact solution shape
       solution:
         - h
+mc_dropout:
+  enable: false
+  num_mc_samples: 100
+  dropout_rate: 0.1
 
 net:
   _target_: pinnstorch.models.FCN
   layers: [2, 100, 100, 100, 100, 2]
+  lb: ${mesh.lb}
+  ub: ${mesh.ub}
   output_names:
     - u
     - v
+  dropout_rate: ${mc_dropout.dropout_rate}
+  enable_mc_dropout: ${mc_dropout.enable}
 
 trainer:
   accelerator: gpu
@@ -104,7 +112,7 @@ task_name: schrodinger
 
 # Ensemble configuration
 ensemble:
-  enable: true
+  enable: false
   n_models: 5
   base_seeds: [1234, 2345, 3456, 4567, 5678]
 
@@ -112,7 +120,7 @@ ensemble:
 logger:
   wandb:
     project: "schrodinger_pinn_uq"
-    group: "ensemble_baseline"
+    group: "MC_dropout"
 
 hydra:
   searchpath:

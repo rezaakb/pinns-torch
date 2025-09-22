@@ -52,12 +52,102 @@ def pde_fn(outputs: Dict[str, torch.Tensor],
     return outputs
 
 
+def perform_mc_predictions(cfg, model, save_dir):
+    """Perform MC-Dropout predictions and save results"""
+    
+    print("Starting MC-Dropout predictions...")
+    
+    # Create prediction coordinates (same as validation data)
+    n_x = cfg.spatial_domain.shape[0]
+    n_t = cfg.time_domain.t_points
+    
+    x = torch.linspace(cfg.mesh.lb[0], cfg.mesh.ub[0], n_x).reshape(-1, 1)
+    t = torch.linspace(cfg.mesh.lb[1], cfg.mesh.ub[1], n_t).reshape(-1, 1)
+    
+    # Create meshgrid for all combinations
+    X, T = torch.meshgrid(x.squeeze(), t.squeeze(), indexing='ij')
+    spatial_coords = [X.reshape(-1, 1)]
+    time_coords = T.reshape(-1, 1)
+    
+    # Move to device
+    device = next(model.parameters()).device
+    spatial_coords = [coord.to(device) for coord in spatial_coords]
+    time_coords = time_coords.to(device)
+    
+    # Perform MC sampling
+    num_samples = cfg.mc_dropout.num_mc_samples
+    mc_results = model.mc_predict(spatial_coords, time_coords, num_samples)
+    
+    # Save predictions
+    predictions = {
+        'u_mean': mc_results['u_mean'].cpu().numpy(),
+        'u_std': mc_results['u_std'].cpu().numpy(),
+        'v_mean': mc_results['v_mean'].cpu().numpy(),
+        'v_std': mc_results['v_std'].cpu().numpy(),
+        'h_mean': mc_results['h_mean'].cpu().numpy(),
+        'h_std': mc_results['h_std'].cpu().numpy()
+    }
+    
+    pred_dir = save_dir / "predictions"
+    pred_dir.mkdir(exist_ok=True)
+    
+    for key, value in predictions.items():
+        np.save(pred_dir / f"{key}.npy", value)
+    
+    print(f"MC-Dropout predictions saved to {pred_dir}")
+    
+    # Log uncertainty statistics to wandb
+    if wandb.run:
+        for component in ['u', 'v', 'h']:
+            mean_uncertainty = np.mean(predictions[f'{component}_std'])
+            max_uncertainty = np.max(predictions[f'{component}_std'])
+            wandb.log({
+                f"mc_dropout_mean_uncertainty_{component}": mean_uncertainty,
+                f"mc_dropout_max_uncertainty_{component}": max_uncertainty
+            })
+
+
+def train_mc_dropout(cfg: DictConfig):
+    """Train model with MC-Dropout and perform uncertainty quantification"""
+    
+    print("Starting MC-Dropout training...")
+    
+    # Train single model with dropout
+    metric_dict, object_dict = pinnstorch.train(
+        cfg, read_data_fn=read_data_fn, pde_fn=pde_fn, output_fn=output_fn
+    )
+    
+    print("MC-Dropout training completed. Starting uncertainty analysis...")
+    
+    # Get trained model and trainer
+    model = object_dict.get("model")
+    trainer = object_dict.get("trainer")
+    
+    # Save model
+    save_dir = Path(cfg.paths.output_dir) / "mc_dropout_model"
+    save_dir.mkdir(parents=True, exist_ok=True)
+    
+    if trainer and hasattr(trainer, 'checkpoint_callback') and trainer.checkpoint_callback:
+        best_path = trainer.checkpoint_callback.best_model_path
+        if best_path:
+            torch.save(torch.load(best_path, weights_only=False), save_dir / "best_model.ckpt")
+    
+    # Perform MC predictions if model has mc_predict method
+    if model and hasattr(model.net, 'mc_predict'):
+        perform_mc_predictions(cfg, model.net, save_dir)
+    else:
+        print("Warning: Model does not support MC-Dropout predictions")
+    
+    return metric_dict.get("error", None)
+
+
 @hydra.main(version_base="1.3", config_path="configs", config_name="config.yaml")
 def main(cfg: DictConfig) -> Optional[float]:
     pinnstorch.utils.extras(cfg)
     
+    # Check for ensemble mode
     if cfg.get("ensemble", {}).get("enable", False):
-        # Ensemble training
+        # Ensemble training (your existing code)
         ensemble_results = []
         save_dir = Path(cfg.paths.output_dir) / "ensemble_models"
         save_dir.mkdir(parents=True, exist_ok=True)
@@ -107,7 +197,7 @@ def main(cfg: DictConfig) -> Optional[float]:
             trainer = object_dict.get("trainer")
             if trainer and hasattr(trainer, 'checkpoint_callback') and trainer.checkpoint_callback and trainer.checkpoint_callback.best_model_path:
                 torch.save(
-                    torch.load(trainer.checkpoint_callback.best_model_path), 
+                    torch.load(trainer.checkpoint_callback.best_model_path, weights_only=False), 
                     model_dir / "best_model.ckpt"
                 )
             
@@ -116,7 +206,7 @@ def main(cfg: DictConfig) -> Optional[float]:
             if wandb.run:
                 wandb.finish()
         
-        # Ensemble aggregation
+        # Ensemble aggregation logic (your existing code)
         if cfg.get("logger", {}).get("wandb"):
             wandb.init(
                 project=cfg.logger.wandb.get("project", "schrodinger_pinn"),
@@ -126,7 +216,6 @@ def main(cfg: DictConfig) -> Optional[float]:
                 reinit=True
             )
         
-        # Compute ensemble statistics
         metric_values = []
         for result in ensemble_results:
             if "error" in result:
@@ -147,6 +236,25 @@ def main(cfg: DictConfig) -> Optional[float]:
             return ensemble_mean
         
         return None
+    
+    # Check for MC-Dropout mode
+    elif cfg.get("mc_dropout", {}).get("enable", False):
+        # Initialize wandb for MC-Dropout
+        if cfg.get("logger", {}).get("wandb"):
+            wandb.init(
+                project=cfg.logger.wandb.get("project", "schrodinger_pinn"),
+                group="mc_dropout_baseline",
+                name="mc_dropout_training",
+                tags=cfg.get("tags", []) + ["mc_dropout"],
+                reinit=True
+            )
+        
+        result = train_mc_dropout(cfg)
+        
+        if wandb.run:
+            wandb.finish()
+            
+        return result
         
     else:
         # Original single model training
