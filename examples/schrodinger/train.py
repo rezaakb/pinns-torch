@@ -1,8 +1,10 @@
 from typing import Any, Dict, List, Optional, Tuple
+from pathlib import Path
 
 import hydra
 import numpy as np
 import torch
+import wandb
 
 from omegaconf import DictConfig
 
@@ -52,28 +54,111 @@ def pde_fn(outputs: Dict[str, torch.Tensor],
 
 @hydra.main(version_base="1.3", config_path="configs", config_name="config.yaml")
 def main(cfg: DictConfig) -> Optional[float]:
-    """Main entry point for training.
-
-    :param cfg: DictConfig configuration composed by Hydra.
-    :return: Optional[float] with optimized metric value.
-    """
-
-    # apply extra utilities
-    # (e.g. ask for tags if none are provided in cfg, print cfg tree, etc.)
     pinnstorch.utils.extras(cfg)
-
-    # train the model
-    metric_dict, _ = pinnstorch.train(
-        cfg, read_data_fn=read_data_fn, pde_fn=pde_fn, output_fn=output_fn
-    )
-
-    # safely retrieve metric value for hydra-based hyperparameter optimization
-    metric_value = pinnstorch.utils.get_metric_value(
-        metric_dict=metric_dict, metric_names=cfg.get("optimized_metric")
-    )
-
-    # return optimized metric
-    return metric_value
+    
+    if cfg.get("ensemble", {}).get("enable", False):
+        # Ensemble training
+        ensemble_results = []
+        save_dir = Path(cfg.paths.output_dir) / "ensemble_models"
+        save_dir.mkdir(parents=True, exist_ok=True)
+        
+        for i in range(cfg.ensemble.n_models):
+            print(f"Training ensemble model {i+1}/{cfg.ensemble.n_models}")
+            
+            # Set seed
+            seed = cfg.ensemble.base_seeds[i]
+            torch.manual_seed(seed)
+            np.random.seed(seed)
+            
+            # Update config for this model
+            model_cfg = cfg.copy()
+            model_cfg.seed = seed
+            model_cfg.tags = cfg.get("tags", []) + [f"ensemble_model_{i}"]
+            
+            # Create separate output directory for each model
+            base_output_dir = Path(cfg.paths.output_dir)
+            model_output_dir = base_output_dir.parent / f"{base_output_dir.name}_model_{i}"
+            model_cfg.paths.output_dir = str(model_output_dir)
+            model_cfg.task_name = f"{cfg.task_name}_model_{i}"
+            
+            # Initialize wandb for this model
+            if cfg.get("logger", {}).get("wandb"):
+                wandb.init(
+                    project=cfg.logger.wandb.get("project", "schrodinger_pinn"),
+                    group="ensemble_baseline",
+                    name=f"model_{i}",
+                    tags=model_cfg.tags,
+                    reinit=True
+                )
+            
+            # Train model
+            metric_dict, object_dict = pinnstorch.train(
+                model_cfg, 
+                read_data_fn=read_data_fn, 
+                pde_fn=pde_fn, 
+                output_fn=output_fn
+            )
+            
+            # Save model
+            model_dir = save_dir / f"model_{i}"
+            model_dir.mkdir(exist_ok=True)
+            
+            # Get trainer from object_dict
+            trainer = object_dict.get("trainer")
+            if trainer and hasattr(trainer, 'checkpoint_callback') and trainer.checkpoint_callback and trainer.checkpoint_callback.best_model_path:
+                torch.save(
+                    torch.load(trainer.checkpoint_callback.best_model_path), 
+                    model_dir / "best_model.ckpt"
+                )
+            
+            ensemble_results.append(metric_dict)
+            
+            if wandb.run:
+                wandb.finish()
+        
+        # Ensemble aggregation
+        if cfg.get("logger", {}).get("wandb"):
+            wandb.init(
+                project=cfg.logger.wandb.get("project", "schrodinger_pinn"),
+                group="ensemble_baseline", 
+                name="ensemble_aggregation",
+                tags=cfg.get("tags", []) + ["ensemble_aggregation"],
+                reinit=True
+            )
+        
+        # Compute ensemble statistics
+        metric_values = []
+        for result in ensemble_results:
+            if "error" in result:
+                metric_values.append(result["error"])
+        
+        if metric_values:
+            ensemble_mean = np.mean(metric_values)
+            ensemble_std = np.std(metric_values)
+            
+            if wandb.run:
+                wandb.log({
+                    "ensemble_mean_error": ensemble_mean,
+                    "ensemble_std_error": ensemble_std,
+                    "ensemble_size": len(metric_values)
+                })
+                wandb.finish()
+            
+            return ensemble_mean
+        
+        return None
+        
+    else:
+        # Original single model training
+        metric_dict, _ = pinnstorch.train(
+            cfg, read_data_fn=read_data_fn, pde_fn=pde_fn, output_fn=output_fn
+        )
+        
+        metric_value = pinnstorch.utils.get_metric_value(
+            metric_dict=metric_dict, metric_names=cfg.get("optimized_metric")
+        )
+        
+        return metric_value
 
 
 if __name__ == "__main__":

@@ -167,3 +167,8 @@ outputs
 misc
 /misc
 /misc/
+
+examples/schrodinger/outputs_old/
+wandb
+/wandb
+/wandb/

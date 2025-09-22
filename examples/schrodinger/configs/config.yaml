@@ -53,6 +53,7 @@ val_dataset:
   - mesh_sampler:
       _target_: pinnstorch.data.MeshSampler
       _partial_: true
+      num_sample: null # Add more validation points
       solution:
         - u
         - v
@@ -62,6 +63,7 @@ pred_dataset:
   - mesh_sampler:
       _target_: pinnstorch.data.MeshSampler
       _partial_: true
+      # num_sample: null  # Use all mesh points for prediction to match exact solution shape
       solution:
         - h
 
@@ -77,7 +79,7 @@ trainer:
   max_epochs: 60000
   devices: [0]
   deterministic: false
-  check_val_every_n_epoch: 60001
+  check_val_every_n_epoch: 60001  # Run validation every 1000 epochs
 
 model:
   loss_fn: mse
@@ -100,6 +102,17 @@ plotting:
 seed: 1234
 task_name: schrodinger
 
+# Ensemble configuration
+ensemble:
+  enable: true
+  n_models: 5
+  base_seeds: [1234, 2345, 3456, 4567, 5678]
+
+# Logger configuration for wandb
+logger:
+  wandb:
+    project: "schrodinger_pinn_uq"
+    group: "ensemble_baseline"
 
 hydra:
   searchpath:
