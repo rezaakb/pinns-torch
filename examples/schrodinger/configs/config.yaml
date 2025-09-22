@@ -53,7 +53,7 @@ val_dataset:
   - mesh_sampler:
       _target_: pinnstorch.data.MeshSampler
       _partial_: true
-      num_sample: null # Add more validation points
+      # num_sample: null # Add more validation points
       solution:
         - u
         - v

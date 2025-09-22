@@ -450,6 +450,11 @@ class PINNModule(LightningModule):
         """
         
         self.val_stage = True
+        
+        # Ensure function_mapping is set for validation-only runs
+        if hasattr(self.trainer, 'datamodule') and self.trainer.datamodule is not None:
+            if not hasattr(self, 'function_mapping') or self.function_mapping is None:
+                self.function_mapping = self.trainer.datamodule.function_mapping
 
     def on_validation_end(self):
         """
