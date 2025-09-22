@@ -57,7 +57,7 @@ def perform_mc_predictions(cfg, model, save_dir):
     
     print("Starting MC-Dropout predictions...")
     
-    # Create prediction coordinates (same as validation data)
+    # Create prediction coordinates
     n_x = cfg.spatial_domain.shape[0]
     n_t = cfg.time_domain.t_points
     
@@ -78,14 +78,25 @@ def perform_mc_predictions(cfg, model, save_dir):
     num_samples = cfg.mc_dropout.num_mc_samples
     mc_results = model.mc_predict(spatial_coords, time_coords, num_samples)
     
+    # Manually compute h statistics from u and v
+    u_samples = mc_results['u_samples']  # (num_samples, batch_size, 1)
+    v_samples = mc_results['v_samples']
+    
+    # Compute h for each sample
+    h_samples = torch.sqrt(u_samples ** 2 + v_samples ** 2)
+    
+    # Compute h statistics
+    h_mean = torch.mean(h_samples, dim=0)
+    h_std = torch.std(h_samples, dim=0)
+    
     # Save predictions
     predictions = {
         'u_mean': mc_results['u_mean'].cpu().numpy(),
         'u_std': mc_results['u_std'].cpu().numpy(),
         'v_mean': mc_results['v_mean'].cpu().numpy(),
         'v_std': mc_results['v_std'].cpu().numpy(),
-        'h_mean': mc_results['h_mean'].cpu().numpy(),
-        'h_std': mc_results['h_std'].cpu().numpy()
+        'h_mean': h_mean.cpu().numpy(),       
+        'h_std': h_std.cpu().numpy()           
     }
     
     pred_dir = save_dir / "predictions"
@@ -105,7 +116,6 @@ def perform_mc_predictions(cfg, model, save_dir):
                 f"mc_dropout_mean_uncertainty_{component}": mean_uncertainty,
                 f"mc_dropout_max_uncertainty_{component}": max_uncertainty
             })
-
 
 def train_mc_dropout(cfg: DictConfig):
     """Train model with MC-Dropout and perform uncertainty quantification"""
@@ -206,7 +216,7 @@ def main(cfg: DictConfig) -> Optional[float]:
             if wandb.run:
                 wandb.finish()
         
-        # Ensemble aggregation logic (your existing code)
+        # Ensemble aggregation logic
         if cfg.get("logger", {}).get("wandb"):
             wandb.init(
                 project=cfg.logger.wandb.get("project", "schrodinger_pinn"),
