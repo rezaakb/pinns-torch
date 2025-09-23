@@ -1,2 +1,2 @@
-# this file is required for inferring the project root directory
-# do not delete
+# This file marks the root of the pinns-torch project
+# It is used by rootutils to find the project root directory
