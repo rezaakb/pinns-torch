@@ -62,10 +62,17 @@ class FCN(nn.Module):
         
         predictions = []
         
-        with torch.no_grad():
-            for _ in range(num_samples):
-                pred = self.forward(spatial, time)
-                predictions.append(pred)
+        # Don't use torch.no_grad() here - it disables dropout randomness!
+        # We need dropout to be random for MC sampling
+        for _ in range(num_samples):
+            # Set requires_grad=False for input tensors to save memory
+            spatial_no_grad = [s.detach() for s in spatial]
+            time_no_grad = time.detach()
+            
+            pred = self.forward(spatial_no_grad, time_no_grad)
+            # Detach predictions to avoid gradient accumulation
+            pred_detached = {k: v.detach() for k, v in pred.items()}
+            predictions.append(pred_detached)
         
         self.train(was_training)
         

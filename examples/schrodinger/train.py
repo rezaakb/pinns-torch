@@ -56,6 +56,16 @@ def perform_mc_predictions(cfg, model, save_dir):
     """Perform MC-Dropout predictions and save results"""
     
     print("Starting MC-Dropout predictions...")
+    print(f"Model enable_mc_dropout: {getattr(model, 'enable_mc_dropout', 'Not found')}")
+    print(f"Model dropout_rate: {getattr(model, 'dropout_rate', 'Not found')}")
+    print(f"Model training mode: {model.training}")
+    
+    # Check if model has dropout layers
+    dropout_layers = []
+    for name, module in model.named_modules():
+        if isinstance(module, torch.nn.Dropout):
+            dropout_layers.append((name, module.p))
+    print(f"Found {len(dropout_layers)} dropout layers: {dropout_layers}")
     
     # Create prediction coordinates
     n_x = cfg.spatial_domain.shape[0]
@@ -76,6 +86,30 @@ def perform_mc_predictions(cfg, model, save_dir):
     
     # Perform MC sampling
     num_samples = cfg.mc_dropout.num_mc_samples
+    print(f"Performing MC Dropout with {num_samples} samples...")
+    print(f"Model has mc_predict method: {hasattr(model, 'mc_predict')}")
+    
+    # Test a few forward passes to see if dropout is working
+    print("Testing dropout randomness...")
+    model.train()  # Ensure training mode
+    test_preds = []
+    
+    # Create a small test batch
+    test_spatial = [coord[:10] for coord in spatial_coords]  # Take first 10 points
+    test_time = time_coords[:10]
+    
+    for i in range(3):
+        with torch.no_grad():
+            pred = model.forward(test_spatial, test_time)  # Small subset for testing
+            test_u_mean = torch.mean(pred['u']).item()
+            test_preds.append(test_u_mean)
+            print(f"Test forward pass {i+1}: u_mean = {test_u_mean}")
+    
+    if len(set([f"{p:.6f}" for p in test_preds])) == 1:
+        print("WARNING: All test predictions are identical! Dropout may not be working.")
+    else:
+        print("Good: Test predictions are different, dropout appears to be working.")
+    
     mc_results = model.mc_predict(spatial_coords, time_coords, num_samples)
     
     # Manually compute h statistics from u and v
@@ -121,6 +155,9 @@ def train_mc_dropout(cfg: DictConfig):
     """Train model with MC-Dropout and perform uncertainty quantification"""
     
     print("Starting MC-Dropout training...")
+    print(f"Config train flag: {cfg.get('train')}")
+    print(f"Config ckpt_path: {cfg.get('ckpt_path')}")
+    print(f"MC Dropout config: enable={cfg.mc_dropout.enable}, dropout_rate={cfg.mc_dropout.dropout_rate}")
     
     # Train single model with dropout
     metric_dict, object_dict = pinnstorch.train(
@@ -132,6 +169,12 @@ def train_mc_dropout(cfg: DictConfig):
     # Get trained model and trainer
     model = object_dict.get("model")
     trainer = object_dict.get("trainer")
+    
+    print(f"Model type: {type(model)}")
+    print(f"Model.net type: {type(model.net) if model else 'Model is None'}")
+    if model and hasattr(model, 'net'):
+        print(f"Model.net enable_mc_dropout: {getattr(model.net, 'enable_mc_dropout', 'Not found')}")
+        print(f"Model.net dropout_rate: {getattr(model.net, 'dropout_rate', 'Not found')}")
     
     # Save model
     save_dir = Path(cfg.paths.output_dir) / "mc_dropout_model"
