@@ -1,0 +1,75 @@
+defaults:
+  - train
+  - _self_
+
+N0: 100
+N_b: 100
+N_f: 10_000
+
+time_domain:
+  _target_: pinnstorch.data.TimeDomain
+  t_interval: [0, 1.0]
+  t_points: 201
+
+spatial_domain:
+  _target_: pinnstorch.data.Interval
+  x_interval: [0, 1]
+  shape: [256, 1]
+
+mesh:
+  _target_: pinnstorch.data.Mesh
+  root_dir: null
+  read_data_fn: ???
+  ub: [1.0, 1.0]
+  lb: [0.0, 0.0]
+
+train_datasets:
+  - mesh_sampler:
+      _target_: pinnstorch.data.MeshSampler
+      _partial_: true
+      num_sample: ${N_f}
+      collection_points:
+        - f
+
+  - initial_condition:
+      _target_: pinnstorch.data.InitialCondition
+      _partial_: true
+      num_sample: ${N0}
+      solution:
+        - u
+        - v
+
+  - dirichlet_boundary_condition:
+      _target_: pinnstorch.data.DirichletBoundaryCondition
+      _partial_: true
+      num_sample: ${N_b}
+      solution:
+        - u
+
+val_dataset:
+  - mesh_sampler:
+      _target_: pinnstorch.data.MeshSampler
+      _partial_: true
+      solution:
+        - u
+
+pred_dataset:
+  - mesh_sampler:
+      _target_: pinnstorch.data.MeshSampler
+      _partial_: true
+      solution:
+        - u
+
+net:
+  _target_: pinnstorch.models.FCN
+  layers: [2, 50, 50, 50, 50, 50, 1]
+  output_names:
+    - u
+
+trainer:
+  accelerator: gpu
+  max_epochs: 20000
+  devices:
+    - 0
+  deterministic: false
+  check_val_every_n_epoch: 20001
